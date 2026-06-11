@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FORGE — Dubai Airports · Scenario 6: Power Supply</title>
+
+<!-- Fonts: Inter from Google Fonts (only external dependency) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<!-- React via CDN + Babel standalone for JSX (no build step) -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  :root{
+    --bg:#0E0F1A;
+    --sidebar:#13152A;
+    --card:#1A1D35;
+    --card-border:#2C2D65;
+    --purple:#5B4B8A;
+    --orange:#F58B1F;
+    --red:#E71C57;
+    --amber:#E65100;
+    --green:#2E7D32;
+    --text:#FFFFFF;
+    --muted:#9A9AB0;
+    --sidebar-w:280px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  #root{height:100%;}
+
+  /* ---------- App shell ---------- */
+  .app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex;align-items:center;
+    height:60px;flex:0 0 60px;
+    background:var(--sidebar);
+    border-bottom:1px solid var(--card-border);
+    padding:0 20px;
+    z-index:30;
+  }
+  .topbar-left{display:flex;align-items:center;gap:12px;min-width:var(--sidebar-w);}
+  .forge-icon{
+    width:30px;height:30px;border-radius:6px;
+    background:var(--purple);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:600;font-size:16px;color:#fff;
+  }
+  .forge-wordmark{display:flex;flex-direction:column;line-height:1.05;}
+  .forge-name{font-weight:600;font-size:15px;letter-spacing:.5px;}
+  .forge-sub{font-size:9px;letter-spacing:1.5px;color:var(--muted);font-weight:500;}
+  .topbar-center{flex:1;text-align:center;color:var(--muted);font-size:12px;letter-spacing:2px;font-weight:500;}
+  .topbar-right{
+    min-width:var(--sidebar-w);text-align:right;
+    font-size:12px;color:var(--muted);font-weight:500;
+  }
+  .topbar-right b{color:var(--text);font-weight:600;}
+
+  .hamburger{
+    display:none;background:none;border:none;color:var(--text);
+    font-size:22px;cursor:pointer;margin-right:12px;padding:4px 8px;line-height:1;
+  }
+
+  /* ---------- Body row ---------- */
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:var(--sidebar-w);flex:0 0 var(--sidebar-w);
+    background:var(--sidebar);
+    border-right:1px solid var(--card-border);
+    overflow-y:auto;padding:18px 0 40px;
+    z-index:20;
+  }
+  .sidebar-section-label{
+    color:var(--orange);font-size:10px;font-weight:600;letter-spacing:1.8px;
+    padding:6px 22px;margin-top:8px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:12px;
+    padding:9px 22px;cursor:pointer;
+    color:var(--muted);font-size:13px;font-weight:500;
+    border-left:3px solid transparent;
+    transition:background .12s ease,color .12s ease;
+  }
+  .nav-item:hover{background:rgba(255,255,255,.03);color:var(--text);}
+  .nav-item.active{
+    color:var(--text);background:rgba(91,75,138,.18);
+    border-left:3px solid var(--orange);
+  }
+  .nav-num{
+    color:var(--muted);font-size:11px;font-weight:600;
+    min-width:18px;font-variant-numeric:tabular-nums;
+  }
+  .nav-item.active .nav-num{color:var(--orange);}
+  .nav-tree{
+    margin:6px 14px 0;padding:12px 14px;border-radius:8px;
+    border:1px solid var(--card-border);
+    background:var(--card);
+    cursor:pointer;display:flex;flex-direction:column;gap:3px;
+    transition:border-color .12s ease;
+  }
+  .nav-tree:hover{border-color:var(--purple);}
+  .nav-tree.active{border-color:var(--orange);}
+  .nav-tree-title{color:var(--orange);font-size:12px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:8px;}
+  .nav-tree-sub{color:var(--muted);font-size:11px;}
+
+  /* ---------- Main content ---------- */
+  .main{flex:1;min-width:0;overflow-y:auto;padding:32px 40px 80px;}
+  .main-inner{max-width:920px;margin:0 auto;}
+
+  .page-eyebrow{color:var(--orange);font-size:11px;font-weight:600;letter-spacing:2px;margin-bottom:6px;}
+  .page-title{font-size:26px;font-weight:600;margin:0 0 22px;letter-spacing:.2px;}
+
+  /* ---------- Cards / chapter blocks ---------- */
+  .card{
+    background:var(--card);border:1px solid var(--card-border);
+    border-radius:8px;padding:22px 24px;margin-bottom:16px;
+  }
+  .section-label{color:var(--orange);font-size:11px;font-weight:600;letter-spacing:1.6px;margin:0 0 12px;}
+  .block-h{font-size:14px;font-weight:600;color:var(--text);margin:16px 0 8px;}
+  .block-h:first-child{margin-top:0;}
+  .block-p{color:var(--muted);font-size:14px;margin:0 0 10px;}
+  .block-p b{color:var(--text);font-weight:600;}
+  ul.block-ul{margin:0 0 10px;padding:0;list-style:none;}
+  ul.block-ul li{
+    color:var(--muted);font-size:14px;padding:5px 0 5px 18px;position:relative;
+  }
+  ul.block-ul li::before{
+    content:"";position:absolute;left:2px;top:12px;
+    width:5px;height:5px;border-radius:50%;background:var(--purple);
+  }
+  ul.block-ul li b{color:var(--text);font-weight:600;}
+  .note-box{
+    border:1px solid var(--card-border);border-left:3px solid var(--orange);
+    background:rgba(245,139,31,.06);border-radius:6px;
+    padding:12px 16px;margin:6px 0 10px;color:var(--text);font-size:13px;
+  }
+  .quote-box{
+    border:1px solid var(--card-border);border-radius:6px;
+    background:var(--bg);padding:12px 16px;margin:6px 0 10px;
+    color:var(--muted);font-size:13px;font-style:italic;
+  }
+
+  /* ---------- Badges ---------- */
+  .badge{
+    display:inline-flex;align-items:center;
+    font-size:10px;font-weight:600;letter-spacing:.8px;
+    padding:4px 9px;border-radius:6px;color:#fff;white-space:nowrap;
+    text-transform:uppercase;
+  }
+  .badge.green{background:var(--green);}
+  .badge.amber{background:var(--amber);}
+  .badge.red{background:var(--red);}
+  .badge.branch{background:var(--purple);}
+
+  /* ---------- Escalation tree ---------- */
+  .tree-intro{color:var(--muted);font-size:14px;margin:0 0 20px;max-width:760px;}
+  .tree-controls{display:flex;gap:10px;margin-bottom:18px;}
+  .tree-btn{
+    background:var(--card);border:1px solid var(--card-border);color:var(--muted);
+    font-family:inherit;font-size:12px;font-weight:500;
+    padding:7px 14px;border-radius:6px;cursor:pointer;transition:border-color .12s,color .12s;
+  }
+  .tree-btn:hover{border-color:var(--purple);color:var(--text);}
+
+  .node{margin-bottom:10px;}
+  .node-card{
+    background:var(--card);border:1px solid var(--card-border);
+    border-radius:8px;overflow:hidden;
+  }
+  .node-head{
+    display:flex;align-items:center;gap:14px;
+    padding:16px 18px;cursor:pointer;user-select:none;
+  }
+  .node-head:hover{background:rgba(255,255,255,.02);}
+  .node-titlewrap{flex:1;min-width:0;}
+  .node-title{font-size:15px;font-weight:600;color:var(--text);}
+  .node-meta{font-size:12px;color:var(--muted);margin-top:3px;}
+  .expand-btn{
+    flex:0 0 auto;width:30px;height:30px;border-radius:6px;
+    border:1px solid var(--card-border);background:var(--bg);
+    color:var(--muted);font-size:18px;font-weight:500;line-height:1;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:border-color .12s,color .12s,background .12s;
+  }
+  .node-head:hover .expand-btn{border-color:var(--orange);color:var(--orange);}
+  .expand-btn.open{background:var(--purple);border-color:var(--purple);color:#fff;}
+
+  .node-drawer{
+    max-height:0;overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .node-drawer.open{max-height:6000px;}
+  .node-body{padding:0 18px 16px;border-top:1px solid var(--card-border);}
+
+  .actions-label{
+    color:var(--orange);font-size:10px;font-weight:600;letter-spacing:1.4px;
+    margin:14px 0 10px;
+  }
+  .action{
+    border:1px solid var(--card-border);border-radius:6px;
+    padding:11px 14px;margin-bottom:8px;background:var(--bg);
+  }
+  .action-text{font-size:13px;color:var(--text);font-weight:500;margin-bottom:8px;line-height:1.45;}
+  .action-meta{display:flex;flex-wrap:wrap;gap:10px 26px;}
+  .meta-col{display:flex;flex-direction:column;}
+  .meta-label{font-size:9px;letter-spacing:1px;color:var(--orange);font-weight:600;text-transform:uppercase;margin-bottom:2px;}
+  .meta-role{font-size:12px;color:var(--text);font-weight:500;}
+  .meta-contact-name{font-size:12px;color:var(--muted);}
+  .meta-contact-phone{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+  .children-label{
+    color:var(--muted);font-size:10px;font-weight:600;letter-spacing:1.4px;
+    margin:18px 0 10px;
+  }
+  .children{
+    margin-left:20px;padding-left:18px;
+    border-left:1px solid var(--card-border);
+  }
+
+  /* ---------- Mobile overlay ---------- */
+  .overlay{display:none;}
+
+  @media (max-width:768px){
+    .topbar-left{min-width:auto;}
+    .topbar-center,.topbar-right{display:none;}
+    .hamburger{display:block;}
+    .sidebar{
+      position:fixed;top:60px;left:0;bottom:0;
+      transform:translateX(-100%);transition:transform .25s ease;
+      box-shadow:0 0 0 100vmax rgba(0,0,0,0);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .overlay.show{
+      display:block;position:fixed;inset:60px 0 0 0;
+      background:rgba(0,0,0,.5);z-index:15;
+    }
+    .main{padding:22px 18px 60px;}
+    .children{margin-left:8px;padding-left:12px;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useCallback } = React;
+
+/* =========================================================================
+   DATA — all content hardcoded (single source of truth)
+   ========================================================================= */
+
+const CHAPTERS = [
+  {
+    num:"01", id:"scenario-definition", title:"Scenario Definition",
+    blocks:[
+      {t:"label", text:"WHAT IS THIS SCENARIO?"},
+      {t:"ul", items:[
+        "Grid power fails across the airport campus.",
+        "UPS systems activate and bridge the gap (10–30 minutes) while backup generators spin up.",
+        "If the outage is sustained and generators cannot be maintained, IT systems begin to fail in priority order.",
+        "Multiple physical events can cause this — the IT response is the same regardless of cause. Root cause is for engineering to handle."
+      ]},
+      {t:"label", text:"WHAT IT SYSTEMS WILL BE IMPACTED?"},
+      {t:"h", text:"Systems that will lose power if not on generator or UPS feed:"},
+      {t:"ul", items:[
+        "Check-in kiosks and self-service bag drop",
+        "Passenger information displays",
+        "Terminal Wi-Fi (passenger and staff)",
+        "Non-critical office IT and servers",
+        "Retail point-of-sale systems"
+      ]},
+      {t:"h", text:"Systems that must stay up (on generator feed — validate with Facilities):"},
+      {t:"ul", items:[
+        "ATC communications interfaces",
+        "CCTV — airside and security zones",
+        "Core network backbone",
+        "Data center and cooling systems",
+        "Departure Control System (DCS)",
+        "NOC infrastructure"
+      ]},
+      {t:"label", text:"WHAT IS NOT IN IT SCOPE"},
+      {t:"ul", items:[
+        "Physical power infrastructure — Engineering handles this",
+        "Fuel, generators, grid connections — Facilities Engineering",
+        "Terminal closures, ground stops — Operations business decision",
+        "GCAA, DCAA, media contact — Corporate/Gold tier",
+        "Whether CCTV being down means closing a zone — CCTV system owner's business decision"
+      ]}
+    ]
+  },
+  {
+    num:"02", id:"trigger-triage", title:"Trigger and Triage",
+    blocks:[
+      {t:"label", text:"HOW WILL IT KNOW THIS IS HAPPENING?"},
+      {t:"ul", items:[
+        "NOC dashboards: services dropping off the network almost immediately",
+        "BMS and SCADA alerts fed to Facilities Control Room — NOC will receive notification",
+        "Physical calls from Terminal Operations or Facilities team",
+        "Monitoring tools (Dynatrace, Datadog, or equivalent) showing mass service degradation"
+      ]},
+      {t:"label", text:"SEVERITY LEVELS"},
+      {t:"ul", items:[
+        "<b>P3 — Monitor:</b> isolated system impact, generator confirmed running, no critical IT service affected",
+        "<b>P2 — Respond:</b> multiple IT services affected, restoration time unknown, Bronze tier reviews",
+        "<b>P1 — Escalate:</b> data center at risk, safety-critical IT systems degrading, full campus impact"
+      ]},
+      {t:"note", text:"P1/P2/P3 are IT internal triage levels. Bronze/Silver/Gold are declared by Operations, not by IT."}
+    ]
+  },
+  {
+    num:"03", id:"containment", title:"Containment Actions",
+    blocks:[
+      {t:"label", text:"IT SHUTDOWN PRIORITY — LOAD SHEDDING FROM IT PERSPECTIVE"},
+      {t:"h", text:"Tier 1 — Keep running at all costs (must be on generator feed):"},
+      {t:"ul", items:[
+        "ATC communications interfaces",
+        "CCTV systems",
+        "Core network backbone",
+        "Data center CRAC cooling",
+        "NOC and Facilities Control Room infrastructure"
+      ]},
+      {t:"h", text:"Tier 2 — Maintain if capacity allows:"},
+      {t:"ul", items:[
+        "Departure Control System (DCS)",
+        "Check-in systems",
+        "Baggage handling control systems",
+        "Passenger information displays at gates"
+      ]},
+      {t:"h", text:"Tier 3 — Shed first:"},
+      {t:"ul", items:[
+        "Passenger Wi-Fi",
+        "Non-critical office IT",
+        "Retail POS systems",
+        "Staff collaboration tools (non-critical)"
+      ]},
+      {t:"label", text:"DATA CENTER COOLING"},
+      {t:"ul", items:[
+        "If cooling is at risk: initiate DR failover to secondary site before temperatures reach critical threshold",
+        "Gracefully shut down non-critical virtualized workloads to reduce heat load",
+        "Do not wait for a temperature alarm — act when the risk is identified",
+        "Do not fail back from DR until incident is fully resolved"
+      ]}
+    ]
+  },
+  {
+    num:"04", id:"pre-authorized", title:"Pre-Authorized Decisions",
+    blocks:[
+      {t:"p", text:"These are actions IT can take immediately without waiting for approval. Bronze/Silver/Gold tiers are declared by Operations, not by IT. IT executes within its own scope."},
+      {t:"label", text:"IT CAN DO IMMEDIATELY — NO APPROVAL NEEDED"},
+      {t:"ul", items:[
+        "Execute Tier 3 IT shutdown: cut Wi-Fi, non-critical office IT, retail systems",
+        "Initiate DR failover for Tier 1 digital services if data center cooling is at risk",
+        "Switch all Bronze-tier comms to radio — stop relying on IP telephony",
+        "Alert all IT system owners per the communications plan",
+        "Begin IT service status log"
+      ]},
+      {t:"label", text:"REQUIRES IT INCIDENT COMMANDER DECISION"},
+      {t:"ul", items:[
+        "Shutting down any Tier 2 system ahead of schedule",
+        "Deviating from the pre-agreed IT shutdown priority list"
+      ]},
+      {t:"label", text:"OUTSIDE IT SCOPE — NOTIFY THE RELEVANT SYSTEM OWNER AND LET THEM DECIDE"},
+      {t:"ul", items:[
+        "Whether to close a terminal — notify Terminal Operations system owner",
+        "Whether to issue a ground stop — notify DCS/Operations system owner",
+        "Whether CCTV loss means closing a security zone — notify CCTV system owner",
+        "Any action affecting airline operations — notify Airline Relations"
+      ]}
+    ]
+  },
+  {
+    num:"05", id:"communications", title:"Communications",
+    blocks:[
+      {t:"p", text:"IT communicates with system owners only. System owners make their own business decisions. IT does not contact GCAA, media, or corporate directly."},
+      {t:"label", text:"WHO IT CONTACTS — IMMEDIATE (WITHIN 15 MINUTES OF P1)"},
+      {t:"ul", items:[
+        "<b>CCTV System Owner</b> — confirm power status of all CCTV zones, flag any zones that are dark",
+        "<b>Network Lead / ATC Comms Interface Owner</b> — confirm ATC interface status",
+        "<b>Infrastructure Lead / Data Center</b> — confirm cooling status, DR failover readiness",
+        "<b>NOC Manager</b> — confirm full service status map"
+      ]},
+      {t:"label", text:"WHO IT CONTACTS — WITHIN 30 MINUTES"},
+      {t:"ul", items:[
+        "<b>DCS System Owner</b> — confirm Departure Control System status",
+        "<b>Baggage Systems Owner</b> — confirm baggage handling status",
+        "<b>Terminal IT / Passenger Display Systems Owner</b> — confirm display status",
+        "<b>Ground Handling IT Liaison</b> — confirm comms status with ground teams"
+      ]},
+      {t:"label", text:"WHAT TO SAY"},
+      {t:"p", text:"Keep it factual and short: what system is affected, current status, what you need from them, when you need it."},
+      {t:"quote", text:"“This is [Name], IT Incident Commander. We have a P1 power incident. I need you to confirm the status of [your system] within 10 minutes — is it on generator feed, is it operational, what is your fallback?”"},
+      {t:"label", text:"IF IT COMMS SYSTEMS ARE DOWN"},
+      {t:"ul", items:[
+        "<b>Primary fallback:</b> VHF radio — all Bronze-tier must have access",
+        "<b>Secondary:</b> satellite phones for IT Incident Commander",
+        "Pre-agreed mobile messaging group for Bronze coordination"
+      ]}
+    ]
+  },
+  {
+    num:"06", id:"roles", title:"Roles and Decision Rights",
+    blocks:[
+      {t:"label", text:"IT INCIDENT COMMANDER"},
+      {t:"ul", items:[
+        "Owns the technical bridge — all IT decisions route through this role",
+        "Calls go/no-go on DR failover, Tier 2 shutdowns, recovery sequence",
+        "Single accountable IT owner for the duration of the incident"
+      ]},
+      {t:"label", text:"NOC MANAGER"},
+      {t:"ul", items:[
+        "Monitors all service dashboards",
+        "Maintains the IT service status log",
+        "First point of contact for all system owner alerts"
+      ]},
+      {t:"label", text:"INFRASTRUCTURE LEAD / DATA CENTER"},
+      {t:"ul", items:[
+        "Owns cooling status and DR failover execution",
+        "Reports cooling thresholds to IT Incident Commander"
+      ]},
+      {t:"label", text:"NETWORK LEAD"},
+      {t:"ul", items:[
+        "Owns ATC comms interface status and core network backbone",
+        "Notifies ATC system owner if interface degrades"
+      ]},
+      {t:"label", text:"KEY SYSTEM OWNERS IT MUST CONTACT (PLACEHOLDERS — DA TO FILL)"},
+      {t:"contacts", items:[
+        {role:"CCTV System Owner"},
+        {role:"ATC Comms Interface Owner"},
+        {role:"DCS Owner"},
+        {role:"Baggage Systems Owner"},
+        {role:"Terminal IT / Passenger Displays"},
+        {role:"Ground Handling IT Liaison"}
+      ]}
+    ]
+  },
+  {
+    num:"07", id:"recovery", title:"Recovery Actions",
+    blocks:[
+      {t:"label", text:"RECOVERY SEQUENCE — IT ONLY"},
+      {t:"note", text:"Do not begin recovery until power stability is confirmed by Facilities. IT Incident Commander calls go/no-go."},
+      {t:"ul", items:[
+        "<b>Phase 0 — Gate:</b> confirm power is stable. IT Incident Commander decision.",
+        "<b>Phase 1 — Restore Tier 1 IT systems</b> (ATC interface, CCTV, core network, NOC). Target: within 2 hours of power stable.",
+        "<b>Phase 2 — Restore Tier 2 IT systems</b> (DCS, check-in, baggage, displays). Notify all system owners when their system is back. Target: T+2h to T+4h.",
+        "<b>Phase 3 — Restore Tier 3 IT systems</b> (Wi-Fi, office IT, retail). Target: T+4h to T+6h.",
+        "<b>Phase 4 — IT Incident Commander confirms full IT recovery.</b> DR failback scheduled separately in a low-traffic window."
+      ]},
+      {t:"label", text:"DR FAILBACK"},
+      {t:"ul", items:[
+        "Do not fail back during the incident or under operational load",
+        "Schedule a dedicated failback window after full recovery",
+        "Infrastructure Lead owns the failback plan and execution"
+      ]}
+    ]
+  },
+  {
+    num:"08", id:"closure", title:"Closure Criteria",
+    blocks:[
+      {t:"label", text:"IT CLOSURE — IT INCIDENT COMMANDER CONFIRMS"},
+      {t:"ul", items:[
+        "All Tier 1 and Tier 2 IT systems operational and validated",
+        "No active P1 or P2 alerts on NOC dashboards",
+        "All system owners notified of restoration",
+        "IT service log closed and archived",
+        "DR failback plan documented and scheduled"
+      ]},
+      {t:"note", text:"IT Incident Commander signs off IT closure. Operational closure is the Airport Operations Director's call."}
+    ]
+  },
+  {
+    num:"09", id:"impact-pathway", title:"Impact Pathway",
+    blocks:[
+      {t:"label", text:"IT SERVICE DEGRADATION TIMELINE"},
+      {t:"ul", items:[
+        "<b>0–30 minutes:</b> UPS active. No IT services lost if generator starts. NOC monitoring.",
+        "<b>30 minutes – 2 hours:</b> Generator running. IT services stable. Load shedding of Tier 3 in progress.",
+        "<b>2–8 hours:</b> If generator capacity at risk, data center cooling degrades. DR failover initiated. Tier 2 services may be impacted.",
+        "<b>8+ hours:</b> Full IT service review. DR capacity may be strained. Structured recovery planning begins."
+      ]},
+      {t:"label", text:"INVESTMENT CASE (IT PERSPECTIVE)"},
+      {t:"ul", items:[
+        "Pre-contracting a mobile generator supplier with SLA removes the generator failure risk from IT's response scope",
+        "Confirming data center cooling is on a dedicated generator circuit eliminates the DR failover risk",
+        "Investing in a secondary internet connection (e.g., satellite backup) removes the IP comms dependency"
+      ]}
+    ]
+  },
+  {
+    num:"10", id:"post-incident", title:"Post-Incident Review",
+    blocks:[
+      {t:"p", text:"Review is scenario-specific. Focus only on IT-relevant questions for this exact scenario."},
+      {t:"label", text:"IT-SPECIFIC REVIEW QUESTIONS FOR THIS SCENARIO"},
+      {t:"ul", items:[
+        "Did the NOC detect the power impact before receiving a call from Facilities? If not, why?",
+        "Was the Tier 1/2/3 IT shutdown priority list followed correctly? Were any systems wrongly classified?",
+        "Was the DR failover triggered at the right threshold, or too early/late?",
+        "Were all IT system owners reachable within the required timeframe?",
+        "Did IP telephony go down? Was the radio fallback effective?",
+        "Was the IT recovery sequence correct? Did any Tier 2 system come back before Tier 1?",
+        "Were any non-IT decisions accidentally made by IT (e.g., advising on terminal closure)?"
+      ]},
+      {t:"label", text:"OUTPUTS"},
+      {t:"ul", items:[
+        "Updated Tier 1/2/3 system classification if any systems were wrongly assigned",
+        "Updated contact list for system owners",
+        "Updated DR failover threshold if triggered incorrectly",
+        "Findings fed into the next simulation cycle"
+      ]}
+    ]
+  },
+  {
+    num:"11", id:"training", title:"Training and Rehearsal",
+    blocks:[
+      {t:"label", text:"WHAT TO REHEARSE"},
+      {t:"ul", items:[
+        "Speed of P1 declaration from first NOC alert",
+        "Execution of Tier 3 IT shutdown — does the team know which systems to cut?",
+        "DR failover execution — is the threshold clear?",
+        "Communications under degraded conditions — radio and satellite phone drill",
+        "Recovery gate decisions — does IT Incident Commander know when to call go/no-go?"
+      ]},
+      {t:"label", text:"PASS/FAIL CRITERIA"},
+      {t:"ul", items:[
+        "All Tier 1 IT systems confirmed protected within 15 minutes of P1",
+        "All IT system owners contacted within 30 minutes of P1",
+        "DR failover initiated within defined cooling threshold — not after",
+        "No IT team member makes a business decision outside IT scope"
+      ]}
+    ]
+  }
+];
+
+// Placeholders applied to every action contact (DA fills these in).
+const TBC_NAME = "[Name TBC]";
+const TBC_PHONE = "[+971 XX XXX XXXX]";
+
+const a = (text, role) => ({ text, role, contactName: TBC_NAME, contactPhone: TBC_PHONE });
+
+const TREE = {
+  id:"root",
+  title:"GRID POWER LOST — full campus",
+  severity:"p1",
+  meta:"Trigger: NOC detects mass service degradation OR Facilities notifies NOC",
+  actions:[
+    a("IT Incident Commander declares P1 internally.","IT Incident Commander"),
+    a("NOC opens IT service status log and begins documenting all affected systems.","NOC Manager"),
+    a("Execute Tier 3 IT shutdown immediately — cut Wi-Fi, non-critical office IT, retail systems.","NOC Manager + Infrastructure Lead"),
+    a("Switch all Bronze-tier communications to VHF radio — stop using IP telephony.","IT Incident Commander"),
+    a("Alert all Tier 1 system owners (CCTV, ATC interface, DCS, Network Lead).","NOC Manager"),
+    a("Confirm data center cooling status and DR failover readiness.","Infrastructure Lead"),
+    a("Confirm core network backbone status.","Network Lead")
+  ],
+  children:[
+    {
+      id:"branch-1", title:"Branch 1 · Generator response", severity:"branch",
+      meta:"What happens when the backup generator is called on.",
+      actions:[],
+      children:[
+        {
+          id:"1a", title:"Generator starts successfully", severity:"manageable",
+          meta:"Condition: Generator auto-starts and load transfer completes",
+          actions:[
+            a("Confirm all Tier 1 IT systems are on generator feed and operational.","NOC Manager"),
+            a("Monitor data center temperature — log every 15 minutes.","Infrastructure Lead"),
+            a("Confirm Tier 2 systems status — report to IT Incident Commander.","NOC Manager"),
+            a("Maintain Tier 3 shutdown — do not restore until power is confirmed stable.","IT Incident Commander"),
+            a("Update all system owners on current IT status.","NOC Manager")
+          ],
+          children:[]
+        },
+        {
+          id:"1b", title:"Generator fails to start", severity:"critical",
+          meta:"Condition: Generator does not start within 5 minutes of grid failure",
+          actions:[
+            a("Escalate to IT Incident Commander immediately.","NOC Manager"),
+            a("Calculate remaining UPS runtime — report to IT Incident Commander.","Infrastructure Lead"),
+            a("Initiate DR failover for Tier 1 digital services immediately — do not wait.","Infrastructure Lead"),
+            a("Alert all system owners: power is critically at risk, their systems may go dark.","NOC Manager"),
+            a("Begin controlled graceful shutdown of all non-Tier 1 systems in priority order.","NOC Manager + Infrastructure Lead"),
+            a("Notify IT Incident Commander when UPS is at 50% — prepare for potential full outage.","Infrastructure Lead")
+          ],
+          children:[]
+        },
+        {
+          id:"1c", title:"UPS exhausted, no generator", severity:"critical",
+          meta:"Condition: UPS runtime expired, no generator, no mobile gen arrived yet",
+          actions:[
+            a("Execute emergency shutdown sequence — gracefully power down all non-safety systems in Tier order.","Infrastructure Lead"),
+            a("Confirm which Tier 1 systems are still operational and document.","NOC Manager"),
+            a("Notify all system owners their systems are offline or imminently going offline.","IT Incident Commander"),
+            a("Maintain DR site availability — confirm secondary site is taking load.","Infrastructure Lead"),
+            a("Log exact time of each system going offline for recovery sequencing.","NOC Manager")
+          ],
+          children:[]
+        }
+      ]
+    },
+    {
+      id:"branch-2", title:"Branch 2 · Data center", severity:"branch",
+      meta:"Cooling and disaster-recovery failover decisions.",
+      actions:[],
+      children:[
+        {
+          id:"2a", title:"Data center cooling degrades", severity:"high",
+          meta:"Condition: CRAC units losing effectiveness, temperature rising toward threshold",
+          actions:[
+            a("Initiate DR failover to secondary site — do not wait for temperature alarm.","Infrastructure Lead"),
+            a("Gracefully shut down non-critical virtualized workloads to reduce heat.","Infrastructure Lead"),
+            a("Notify IT Incident Commander of failover initiation and estimated completion.","Infrastructure Lead"),
+            a("Confirm secondary site is accepting load and services are coming online.","NOC Manager"),
+            a("Log temperature readings and failover timeline for post-incident review.","NOC Manager")
+          ],
+          children:[]
+        },
+        {
+          id:"2b", title:"DR failover fails or is unavailable", severity:"critical",
+          meta:"Condition: Secondary site unreachable or capacity insufficient",
+          actions:[
+            a("Notify IT Incident Commander immediately.","Infrastructure Lead"),
+            a("Identify which Tier 1 services can be manually sustained.","Infrastructure Lead + NOC Manager"),
+            a("Notify all affected system owners — their services will be offline.","IT Incident Commander"),
+            a("Document all impacted services and log time of impact.","NOC Manager"),
+            a("Begin planning structured recovery sequence for when power is restored.","IT Incident Commander")
+          ],
+          children:[]
+        },
+        {
+          id:"2c", title:"DR failover succeeds", severity:"manageable",
+          meta:"Condition: Services running on secondary site",
+          actions:[
+            a("Monitor secondary site capacity and performance.","NOC Manager"),
+            a("Confirm all Tier 1 services are accessible from secondary site.","Infrastructure Lead"),
+            a("Notify system owners their services are running from the secondary site.","NOC Manager"),
+            a("Begin planning failback — schedule for low-traffic window after full recovery.","Infrastructure Lead"),
+            a("Do not failback during the incident or under operational load.","IT Incident Commander")
+          ],
+          children:[]
+        }
+      ]
+    },
+    {
+      id:"branch-3", title:"Branch 3 · Safety-critical systems", severity:"branch",
+      meta:"IT notifies the system owner. The business decision is NOT IT's to make.",
+      actions:[],
+      children:[
+        {
+          id:"3a", title:"CCTV loses power", severity:"high",
+          meta:"IT action: notify system owner. Business decision: CCTV system owner.",
+          actions:[
+            a("Detect CCTV system degradation via NOC monitoring.","NOC Manager"),
+            a("Notify CCTV System Owner immediately — confirm which zones are affected.","NOC Manager"),
+            a("Document which CCTV zones are offline and at what time.","NOC Manager"),
+            a("Do NOT make any recommendation on zone closure — that is the CCTV system owner's business decision.","IT Incident Commander"),
+            a("Confirm CCTV system owner has acknowledged the notification.","NOC Manager")
+          ],
+          children:[]
+        },
+        {
+          id:"3b", title:"ATC comms interface degrades", severity:"critical",
+          meta:"IT action: notify system owner. Business decision: ATC system owner / ANSP.",
+          actions:[
+            a("Detect ATC interface degradation via NOC monitoring.","Network Lead"),
+            a("Notify ATC Comms Interface System Owner immediately.","Network Lead"),
+            a("Notify IT Incident Commander of ATC interface status.","Network Lead"),
+            a("Document interface status, degradation timeline, and all actions taken.","NOC Manager"),
+            a("Do NOT contact GCAA or ANSP directly — this is the ATC system owner's responsibility.","IT Incident Commander")
+          ],
+          children:[]
+        },
+        {
+          id:"3c", title:"Core network backbone fails", severity:"critical",
+          meta:"Condition: Core routing and connectivity lost",
+          actions:[
+            a("Initiate emergency network recovery procedure.","Network Lead"),
+            a("Identify which network segments are affected and which are isolated.","Network Lead"),
+            a("Notify IT Incident Commander of full scope of network failure.","Network Lead"),
+            a("Notify all system owners that IT network connectivity is lost.","NOC Manager"),
+            a("Switch all communications to VHF radio immediately.","IT Incident Commander"),
+            a("Assess whether DR site network connection is intact.","Infrastructure Lead")
+          ],
+          children:[]
+        }
+      ]
+    },
+    {
+      id:"branch-4", title:"Branch 4 · IT services", severity:"branch",
+      meta:"Passenger- and operations-facing IT services going offline.",
+      actions:[],
+      children:[
+        {
+          id:"4a", title:"DCS goes offline", severity:"high",
+          meta:"IT action: notify system owner. Business decision: DCS system owner.",
+          actions:[
+            a("Detect DCS degradation via NOC monitoring.","NOC Manager"),
+            a("Notify DCS System Owner immediately.","NOC Manager"),
+            a("Document DCS offline time and last known state.","NOC Manager"),
+            a("Do not make decisions about flight operations — DCS system owner's business decision.","IT Incident Commander")
+          ],
+          children:[]
+        },
+        {
+          id:"4b", title:"IP telephony fails", severity:"high",
+          meta:"Condition: VoIP and email unreachable",
+          actions:[
+            a("Switch all Bronze-tier communications to VHF radio immediately.","IT Incident Commander"),
+            a("Activate satellite phone for IT Incident Commander and Infrastructure Lead.","IT Incident Commander"),
+            a("Notify all system owners via radio or satellite that IP comms are down.","NOC Manager"),
+            a("Activate pre-agreed mobile messaging group for Silver-tier coordination.","IT Incident Commander"),
+            a("Log time of IP comms failure for post-incident review.","NOC Manager")
+          ],
+          children:[]
+        }
+      ]
+    },
+    {
+      id:"branch-5", title:"Branch 5 · Extended outage", severity:"branch",
+      meta:"When the incident runs long and recovery must be structured.",
+      actions:[],
+      children:[
+        {
+          id:"5a", title:"Outage extends beyond 8 hours", severity:"critical",
+          meta:"Condition: No power restoration ETA confirmed",
+          actions:[
+            a("Conduct full IT service review — document every system status.","IT Incident Commander + NOC Manager"),
+            a("Assess DR site capacity for extended operation.","Infrastructure Lead"),
+            a("Notify all system owners of extended outage and current IT service status.","NOC Manager"),
+            a("Begin structured IT recovery plan preparation for when power is restored.","IT Incident Commander"),
+            a("Maintain IT service log with hourly updates.","NOC Manager")
+          ],
+          children:[]
+        },
+        {
+          id:"5b", title:"Multi-day recovery", severity:"critical",
+          meta:"Condition: Power restored but IT recovery will take 24+ hours",
+          actions:[
+            a("Execute phased IT recovery plan: Tier 1 first, then Tier 2, then Tier 3.","IT Incident Commander"),
+            a("Validate each tier before restoring the next — do not rush.","IT Incident Commander"),
+            a("Notify all system owners of restoration sequence and ETAs.","NOC Manager"),
+            a("Schedule DR failback in a dedicated low-traffic window.","Infrastructure Lead"),
+            a("Begin post-incident review preparation — collect all logs and timestamps.","NOC Manager")
+          ],
+          children:[]
+        }
+      ]
+    }
+  ]
+};
+
+/* =========================================================================
+   Helpers
+   ========================================================================= */
+
+const SEVERITY = {
+  p1:        {cls:"red",    label:"P1"},
+  critical:  {cls:"red",    label:"Critical"},
+  high:      {cls:"amber",  label:"High"},
+  manageable:{cls:"green",  label:"Manageable"},
+  branch:    {cls:"branch", label:"Branch"}
+};
+
+// Collect every node id (used for expand/collapse all).
+function collectIds(node, acc){ acc.push(node.id); node.children.forEach(c => collectIds(c, acc)); return acc; }
+const ALL_IDS = collectIds(TREE, []);
+
+/* =========================================================================
+   Components
+   ========================================================================= */
+
+function Badge({severity}){
+  const s = SEVERITY[severity] || SEVERITY.branch;
+  return <span className={"badge " + s.cls}>{s.label}</span>;
+}
+
+function ActionRow({action}){
+  return (
+    <div className="action">
+      <div className="action-text">{action.text}</div>
+      <div className="action-meta">
+        <div className="meta-col">
+          <span className="meta-label">Role</span>
+          <span className="meta-role">{action.role}</span>
+        </div>
+        <div className="meta-col">
+          <span className="meta-label">Contact</span>
+          <span className="meta-contact-name">{action.contactName}</span>
+          <span className="meta-contact-phone">{action.contactPhone}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TreeNode({node, depth, expanded, toggle}){
+  const isOpen = expanded.has(node.id);
+  const hasActions = node.actions && node.actions.length > 0;
+  const hasChildren = node.children && node.children.length > 0;
+
+  return (
+    <div className="node">
+      <div className="node-card">
+        <div className="node-head" onClick={() => toggle(node.id)}>
+          <div className="node-titlewrap">
+            <div className="node-title">{node.title}</div>
+            {node.meta && <div className="node-meta">{node.meta}</div>}
+          </div>
+          <Badge severity={node.severity} />
+          <button
+            className={"expand-btn" + (isOpen ? " open" : "")}
+            aria-expanded={isOpen}
+            aria-label={isOpen ? "Collapse" : "Expand"}
+            onClick={(e) => { e.stopPropagation(); toggle(node.id); }}
+          >{isOpen ? "−" : "+"}</button>
+        </div>
+
+        <div className={"node-drawer" + (isOpen ? " open" : "")}>
+          <div className="node-body">
+            {hasActions && <div className="actions-label">IT ACTIONS</div>}
+            {hasActions && node.actions.map((act, i) => <ActionRow key={i} action={act} />)}
+
+            {hasChildren && <div className="children-label">WHAT-IF BRANCHES</div>}
+            {hasChildren &&
+              <div className="children">
+                {node.children.map(child =>
+                  <TreeNode key={child.id} node={child} depth={depth+1} expanded={expanded} toggle={toggle} />
+                )}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EscalationTree(){
+  const [expanded, setExpanded] = useState(() => new Set()); // collapsed by default
+
+  const toggle = useCallback((id) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
+
+  const expandAll = () => setExpanded(new Set(ALL_IDS));
+  const collapseAll = () => setExpanded(new Set());
+
+  return (
+    <div className="main-inner">
+      <div className="page-eyebrow">INTERACTIVE ESCALATION TREE</div>
+      <h1 className="page-title">Loss of Primary Power Supply</h1>
+      <p className="tree-intro">
+        Each node is a decision point in the IT response. Click <b>+</b> to expand a node and see the
+        IT actions, responsible roles, and contacts — then drill into the what-if branches beneath it.
+        Everything starts collapsed.
+      </p>
+      <div className="tree-controls">
+        <button className="tree-btn" onClick={expandAll}>Expand all</button>
+        <button className="tree-btn" onClick={collapseAll}>Collapse all</button>
+      </div>
+      <TreeNode node={TREE} depth={0} expanded={expanded} toggle={toggle} />
+    </div>
+  );
+}
+
+function ChapterBlock({block}){
+  switch(block.t){
+    case "label": return <div className="section-label">{block.text}</div>;
+    case "h":     return <div className="block-h">{block.text}</div>;
+    case "p":     return <p className="block-p" dangerouslySetInnerHTML={{__html:block.text}} />;
+    case "note":  return <div className="note-box">{block.text}</div>;
+    case "quote": return <div className="quote-box">{block.text}</div>;
+    case "ul":
+      return (
+        <ul className="block-ul">
+          {block.items.map((it,i) => <li key={i} dangerouslySetInnerHTML={{__html:it}} />)}
+        </ul>
+      );
+    case "contacts":
+      return (
+        <div>
+          {block.items.map((c,i) =>
+            <div className="action" key={i}>
+              <div className="action-meta">
+                <div className="meta-col">
+                  <span className="meta-label">Role</span>
+                  <span className="meta-role">{c.role}</span>
+                </div>
+                <div className="meta-col">
+                  <span className="meta-label">Contact</span>
+                  <span className="meta-contact-name">{TBC_NAME}</span>
+                  <span className="meta-contact-phone">{TBC_PHONE}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    default: return null;
+  }
+}
+
+function ChapterPanel({chapter}){
+  return (
+    <div className="main-inner">
+      <div className="page-eyebrow">CHAPTER {chapter.num}</div>
+      <h1 className="page-title">{chapter.title}</h1>
+      <div className="card">
+        {chapter.blocks.map((b,i) => <ChapterBlock key={i} block={b} />)}
+      </div>
+    </div>
+  );
+}
+
+function Sidebar({view, setView, open}){
+  return (
+    <nav className={"sidebar" + (open ? " open" : "")}>
+      <div className="sidebar-section-label">PLAYBOOK CHAPTERS</div>
+      {CHAPTERS.map(ch => {
+        const active = view.type === "chapter" && view.id === ch.id;
+        return (
+          <div
+            key={ch.id}
+            className={"nav-item" + (active ? " active" : "")}
+            onClick={() => setView({type:"chapter", id:ch.id})}
+          >
+            <span className="nav-num">{ch.num}</span>
+            <span>{ch.title}</span>
+          </div>
+        );
+      })}
+
+      <div className="sidebar-section-label" style={{marginTop:"18px"}}>ESCALATION TREE</div>
+      <div
+        className={"nav-tree" + (view.type === "tree" ? " active" : "")}
+        onClick={() => setView({type:"tree"})}
+      >
+        <div className="nav-tree-title">▸ Interactive Escalation Tree</div>
+        <div className="nav-tree-sub">Grid power lost — what-if branches</div>
+      </div>
+    </nav>
+  );
+}
+
+function TopBar({onMenu}){
+  return (
+    <header className="topbar">
+      <button className="hamburger" onClick={onMenu} aria-label="Toggle navigation">☰</button>
+      <div className="topbar-left">
+        <div className="forge-icon">F</div>
+        <div className="forge-wordmark">
+          <span className="forge-name">FORGE</span>
+          <span className="forge-sub">SCENARIO LIBRARY</span>
+        </div>
+      </div>
+      <div className="topbar-center">DUBAI AIRPORTS · BCG</div>
+      <div className="topbar-right">Playbook: <b>Power Supply</b></div>
+    </header>
+  );
+}
+
+function App(){
+  const [view, setViewRaw] = useState({type:"chapter", id:"scenario-definition"});
+  const [navOpen, setNavOpen] = useState(false);
+
+  const setView = (v) => { setViewRaw(v); setNavOpen(false); };
+
+  const chapter = view.type === "chapter"
+    ? CHAPTERS.find(c => c.id === view.id)
+    : null;
+
+  return (
+    <div className="app">
+      <TopBar onMenu={() => setNavOpen(o => !o)} />
+      <div className="body-row">
+        <Sidebar view={view} setView={setView} open={navOpen} />
+        <div className={"overlay" + (navOpen ? " show" : "")} onClick={() => setNavOpen(false)} />
+        <main className="main">
+          {view.type === "tree"
+            ? <EscalationTree />
+            : <ChapterPanel chapter={chapter} />}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
