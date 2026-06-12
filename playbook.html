@@ -125,24 +125,39 @@
   .detect-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
   .detect-text{font-size:13px;color:var(--muted);}
 
-  /* ---------- Triage checklist (automated scoring) ---------- */
+  /* ---------- Interactive checklists (triage, closure, training) ---------- */
   .triage-intro{color:var(--muted);font-size:13px;margin:0 0 12px;}
-  .q-item{border:1px solid var(--card-border);border-radius:6px;background:var(--bg);padding:12px 14px;margin-bottom:9px;}
-  .q-text{font-size:13px;color:var(--text);font-weight:500;margin-bottom:9px;}
-  .q-btns{display:flex;gap:8px;}
-  .q-btn{font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.4px;padding:6px 22px;border-radius:6px;border:1px solid var(--card-border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
-  .q-btn:hover{border-color:var(--purple);color:var(--text);}
-  .q-btn.sel{background:var(--purple);border-color:var(--purple);color:#fff;}
+  .chk-item{display:flex;align-items:center;gap:12px;border:1px solid var(--card-border);border-radius:6px;background:var(--bg);padding:11px 14px;margin-bottom:8px;cursor:pointer;user-select:none;transition:border-color .12s;}
+  .chk-item:hover{border-color:var(--purple);}
+  .chk-box{flex:0 0 auto;width:20px;height:20px;border-radius:5px;border:1px solid var(--card-border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;transition:background .12s,border-color .12s;}
+  .chk-item.on .chk-box{background:var(--purple);border-color:var(--purple);}
+  .chk-text{font-size:13px;color:var(--text);flex:1;}
+  .chk-pts{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto;}
+  .chk-status{margin-top:12px;font-size:13px;font-weight:600;color:var(--muted);border:1px solid var(--card-border);border-radius:6px;padding:11px 14px;background:var(--bg);}
+  .chk-status.done{color:#fff;border-color:var(--green);background:rgba(46,125,50,.15);}
 
+  /* ---------- Rating rows (post-incident scorecard) ---------- */
+  .rate-legend{font-size:11px;color:var(--muted);margin:0 0 12px;}
+  .rate-row{border:1px solid var(--card-border);border-radius:6px;background:var(--bg);padding:12px 14px;margin-bottom:9px;}
+  .rate-q{font-size:13px;color:var(--text);font-weight:500;margin-bottom:9px;}
+  .rate-btns{display:flex;gap:6px;}
+  .rate-btn{width:34px;height:34px;font-family:inherit;font-size:13px;font-weight:600;border-radius:6px;border:1px solid var(--card-border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+  .rate-btn:hover{border-color:var(--purple);color:var(--text);}
+  .rate-btn.sel{background:var(--purple);border-color:var(--purple);color:#fff;}
+
+  /* ---------- Result / severity / maturity badge ---------- */
   .sev-result{margin-top:16px;border:1px solid var(--card-border);border-left:3px solid var(--orange);background:var(--bg);border-radius:6px;padding:16px 18px;}
-  .sev-result-head{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .sev-result-head{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
   .sev-badge{font-size:13px;font-weight:600;letter-spacing:.5px;color:#fff;border-radius:6px;padding:5px 14px;}
   .sev-badge.p3{background:var(--mon);}
   .sev-badge.p2{background:var(--amber);}
   .sev-badge.p1{background:var(--red);}
+  .sev-badge.good{background:var(--green);}
+  .sev-badge.mid{background:var(--amber);}
+  .sev-badge.bad{background:var(--red);}
+  .sev-badge.none{background:var(--mon);}
   .sev-score{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;}
   .sev-desc{font-size:13px;color:var(--text);}
-  .sev-pending{font-size:13px;color:var(--muted);font-style:italic;}
   .cta-btn{margin-top:14px;background:var(--orange);border:none;color:#0E0F1A;font-family:inherit;font-size:13px;font-weight:600;padding:10px 18px;border-radius:6px;cursor:pointer;transition:filter .12s;}
   .cta-btn:hover{filter:brightness(1.08);}
 
@@ -299,13 +314,13 @@ const DETECTION = [
   {icon:"phone", title:"Direct Notification", text:"Facilities team or Terminal Operations contacts the BT team directly to report power loss."}
 ];
 
-/* Each triage question scores points only when answered with the listed trigger answer */
-const TRIAGE_Q = [
-  {q:"Is power loss confirmed across more than one zone?", scoreOn:"Yes", points:1},
-  {q:"Is the backup generator confirmed running?", scoreOn:"No", points:2},
-  {q:"Is any Tier 0 system showing degradation on dashboards?", scoreOn:"Yes", points:3},
-  {q:"Is the estimated duration of the outage more than 2 hours?", scoreOn:"Yes", points:2},
-  {q:"Is the data center temperature rising?", scoreOn:"Yes", points:3}
+/* Checklist of risk conditions. Check the ones that are true now; each adds points. */
+const TRIAGE_CHECKS = [
+  {label:"Power loss confirmed across more than one zone", points:1},
+  {label:"Backup generator is not confirmed running", points:2},
+  {label:"A Tier 0 system is showing degradation on dashboards", points:3},
+  {label:"Estimated outage duration is more than 2 hours", points:2},
+  {label:"Data center temperature is rising", points:3}
 ];
 function severityFor(score){
   if(score >= 6) return {p:"P1", cls:"p1", text:"Critical systems at risk. BT team activates immediately. BT team lead notifies Silver tier"};
@@ -649,8 +664,8 @@ const CHAPTERS = [
     num:"03", id:"containment", title:"Containment Actions",
     blocks:[
       {t:"label", text:"IT SHUTDOWN PRIORITY"},
-      {t:"p", text:"When power is lost, IT systems are prioritized based on operational criticality. The BT team follows this classification to determine which systems to protect and which to shed."},
-      {t:"tier", chip:"TIER 0", text:"Must stay running at all times", items:[
+      {t:"p", text:"When power is lost, IT systems are prioritized based on operational criticality. The BT team follows this classification to determine which systems to protect and which to shed. Each tier below explains what it covers and why before listing the systems in it."},
+      {t:"tier", chip:"TIER 0", text:"Must stay running at all times", desc:"The most critical systems, the ones that require constant availability. They stay powered and protected above everything else and are never shed during the incident. Losing any of these directly threatens safety or the ability to run the airport.", items:[
         "ATC communications interfaces",
         "CCTV systems",
         "Core network backbone",
@@ -658,14 +673,14 @@ const CHAPTERS = [
         "Fire alarm and suppression monitoring",
         "BT team infrastructure"
       ]},
-      {t:"tier", chip:"TIER 1", text:"Maintain to keep the airport safe and navigable", items:[
+      {t:"tier", chip:"TIER 1", text:"Maintain to keep the airport safe and navigable", desc:"Important systems that keep the airport safe and navigable. They are maintained on backup power once Tier 0 is secured, supporting the safe movement of passengers, staff, and aircraft. They are only shed at Silver level and only with business sign-off.", items:[
         "Terminal and airfield lighting",
         "Emergency public address system",
         "Access control systems",
         "Staff communication systems",
         "Perimeter security systems"
       ]},
-      {t:"tier", chip:"TIER 2", text:"Shed to preserve capacity for Tier 0 and Tier 1", items:[
+      {t:"tier", chip:"TIER 2", text:"Shed first to preserve capacity for Tier 0 and Tier 1", desc:"Lower-criticality systems. They are shut down first to preserve generator and cooling capacity for Tier 0 and Tier 1. Shedding them has limited operational impact and buys runtime for everything more critical.", items:[
         "Passenger and staff Wi-Fi",
         "Non-critical office IT",
         "Retail systems"
@@ -714,13 +729,14 @@ const CHAPTERS = [
     num:"08", id:"closure", title:"Closure Criteria",
     blocks:[
       {t:"label", text:"IT CLOSURE CONFIRMED BY BT TEAM LEAD"},
-      {t:"ul", items:[
+      {t:"p", text:"Confirm each criterion. IT closure can be signed off once all are met."},
+      {t:"component", name:"checklist", items:[
         "All Tier 0 and Tier 1 systems operational and validated",
         "No active critical alerts on BT dashboards",
         "All system owners notified of restoration",
         "IT service log closed and archived",
         "Failback to primary data center planned and scheduled"
-      ]},
+      ], doneLabel:"All closure criteria met. BT team lead can confirm IT closure"},
       {t:"note", text:"BT team lead signs off IT closure. Operational closure is confirmed by the Airport Operations Director."}
     ]
   },
@@ -745,17 +761,8 @@ const CHAPTERS = [
   {
     num:"10", id:"post-incident", title:"Post-Incident Review",
     blocks:[
-      {t:"label", text:"IT-SPECIFIC REVIEW QUESTIONS FOR THIS SCENARIO"},
-      {t:"ul", items:[
-        "Did the BT team detect the power impact before receiving a call from Facilities?",
-        "Was the Tier 0, Tier 1, and Tier 2 shutdown priority list followed correctly?",
-        "Were any systems wrongly classified in the tier structure?",
-        "Was the failover to the secondary data center triggered at the right threshold, or too early or too late?",
-        "Were all system owners reachable within the required timeframe?",
-        "Were personal mobile phones effective as a fallback when internal communications were unavailable?",
-        "Was the IT recovery sequence correct, and did any Tier 1 system come back before Tier 0?",
-        "Were any decisions made by BT team that were outside BT scope?"
-      ]}
+      {t:"label", text:"IT-SPECIFIC REVIEW SCORECARD FOR THIS SCENARIO"},
+      {t:"component", name:"review"}
     ]
   },
   {
@@ -771,12 +778,13 @@ const CHAPTERS = [
         "Escalation to Silver tier"
       ]},
       {t:"label", text:"PASS CRITERIA"},
-      {t:"ul", items:[
+      {t:"p", text:"Check off each criterion met during the rehearsal. The rehearsal passes once all are met."},
+      {t:"component", name:"checklist", items:[
         "Tier 0 systems protected within 15 minutes of P1 confirmation",
         "All system owners contacted within 30 minutes of P1 confirmation",
         "Failover initiated within the defined cooling threshold",
         "No BT team decision made outside BT scope"
-      ]}
+      ], doneLabel:"All pass criteria met. Rehearsal passed"}
     ]
   }
 ];
@@ -820,46 +828,32 @@ function DetectionCards(){
 
 function TriageChecklist(){
   const { navigate } = useContext(Nav);
-  const [answers, setAnswers] = useState(() => TRIAGE_Q.map(() => null));
-  const setAnswer = (i, val) => setAnswers(prev => prev.map((v,idx) => idx===i ? val : v));
+  const [checked, setChecked] = useState(() => TRIAGE_CHECKS.map(() => false));
+  const toggle = (i) => setChecked(prev => prev.map((v,idx) => idx===i ? !v : v));
 
-  const answeredCount = answers.filter(v => v !== null).length;
-  const allAnswered = answeredCount === TRIAGE_Q.length;
-  const score = TRIAGE_Q.reduce((sum,q,i) => sum + (answers[i] === q.scoreOn ? q.points : 0), 0);
+  const score = TRIAGE_CHECKS.reduce((sum,c,i) => sum + (checked[i] ? c.points : 0), 0);
   const sev = severityFor(score);
 
   return (
     <div>
-      <p className="triage-intro">Answer each question. The interface scores the answers and assigns the severity level automatically. You do not assign it yourself.</p>
-      {TRIAGE_Q.map((q,i) => (
-        <div className="q-item" key={i}>
-          <div className="q-text">{q.q}</div>
-          <div className="q-btns">
-            {["Yes","No"].map(opt => (
-              <button key={opt}
-                className={"q-btn" + (answers[i]===opt ? " sel" : "")}
-                onClick={() => setAnswer(i, opt)}>{opt}</button>
-            ))}
-          </div>
+      <p className="triage-intro">Check every condition that is true right now. The interface scores the checklist and assigns the severity level automatically. You do not assign it yourself.</p>
+      {TRIAGE_CHECKS.map((c,i) => (
+        <div className={"chk-item" + (checked[i] ? " on" : "")} key={i} onClick={() => toggle(i)}>
+          <span className="chk-box">{checked[i] ? "✓" : ""}</span>
+          <span className="chk-text">{c.label}</span>
+          <span className="chk-pts">+{c.points}</span>
         </div>
       ))}
 
       <div className="sev-result">
-        {answeredCount === 0 ? (
-          <div className="sev-pending">Answer the questions above to calculate the severity level</div>
-        ) : (
-          <React.Fragment>
-            <div className="sev-result-head">
-              <span className={"sev-badge " + sev.cls}>{sev.p}</span>
-              <span className="sev-score">Score {score}{allAnswered ? "" : " so far, " + (TRIAGE_Q.length - answeredCount) + " question(s) left"}</span>
-            </div>
-            <div className="sev-desc">{sev.text}</div>
-            {allAnswered &&
-              <button className="cta-btn" onClick={() => navigate("pre-authorized", P_TO_LEVEL[sev.p])}>
-                Go to Pre-Authorized Decisions
-              </button>}
-          </React.Fragment>
-        )}
+        <div className="sev-result-head">
+          <span className={"sev-badge " + sev.cls}>{sev.p}</span>
+          <span className="sev-score">Score {score}</span>
+        </div>
+        <div className="sev-desc">{sev.text}</div>
+        <button className="cta-btn" onClick={() => navigate("pre-authorized", P_TO_LEVEL[sev.p])}>
+          Go to Pre-Authorized Decisions
+        </button>
       </div>
     </div>
   );
@@ -976,6 +970,12 @@ function RolesResponsibilities(){
   );
 }
 
+const RECOVERY_DESC = {
+  Monitoring:"Minor incident, no shutdown beyond Tier 2. Recovery is three quick gates: confirm power, restore anything that was shed, confirm normal state. No tiered restore sequence is needed.",
+  Bronze:"Tier 2 shutdown was executed. Recovery validates Tier 0 first, then restores Tier 1 and finally Tier 2 in sequence across roughly six hours, with a gate before each step.",
+  Silver:"Tier 0, 1, and 2 shutdown plus cloud migration were executed. Recovery is the full sequence, and the Silver tier and Airport Operations Director are involved at the power gate and at closure."
+};
+
 function RecoveryTimeline(){
   const [level, setLevel] = useState("Monitoring");
   const [active, setActive] = useState(null);
@@ -984,6 +984,7 @@ function RecoveryTimeline(){
   return (
     <div>
       <LevelTabs levels={LEVELS} active={level} onSelect={(lv) => { setLevel(lv); setActive(null); }} />
+      <p className="level-intro">{RECOVERY_DESC[level]}</p>
       <div className="timeline-wrap">
         <div className="phase-row">
           {phases.map((p,i) => (
@@ -1073,6 +1074,79 @@ function EscalationTree(){
   );
 }
 
+/* Post-incident scorecard: rate each question 1 to 5, get an overall maturity band */
+const REVIEW_Q = [
+  "Did the BT team detect the power impact before receiving a call from Facilities?",
+  "Was the Tier 0, Tier 1, and Tier 2 shutdown priority list followed correctly?",
+  "Were systems classified correctly in the tier structure?",
+  "Was the failover to the secondary data center triggered at the right threshold?",
+  "Were all system owners reachable within the required timeframe?",
+  "Were personal mobile phones effective as a fallback when internal communications were unavailable?",
+  "Was the IT recovery sequence correct, with no Tier 1 system restored before Tier 0?",
+  "Did the BT team stay within BT scope throughout the incident?"
+];
+function maturityBand(avg){
+  if(avg >= 4.5) return {band:"Level 5: Optimized", cls:"good", note:"The response was handled excellently across the board. Capture what worked and keep it."};
+  if(avg >= 3.5) return {band:"Level 4: Managed", cls:"good", note:"A strong response with only minor gaps to tighten before the next incident."};
+  if(avg >= 2.5) return {band:"Level 3: Defined", cls:"mid", note:"A workable response with clear areas to improve. Focus on the lowest-scored questions."};
+  if(avg >= 1.5) return {band:"Level 2: Developing", cls:"mid", note:"Several parts of the response need attention. Prioritize the lowest-scored questions."};
+  return {band:"Level 1: Reactive", cls:"bad", note:"The response had significant gaps. Treat the lowest scores as urgent remediation."};
+}
+
+function PostIncidentReview(){
+  const [ratings, setRatings] = useState(() => REVIEW_Q.map(() => 0));
+  const setRating = (i, v) => setRatings(prev => prev.map((x,idx) => idx===i ? v : x));
+  const rated = ratings.filter(v => v > 0);
+  const avg = rated.length ? rated.reduce((s,v) => s + v, 0) / rated.length : 0;
+  const b = rated.length
+    ? maturityBand(avg)
+    : {band:"Not yet rated", cls:"none", note:"Rate each question from 1 (handled poorly) to 5 (handled excellently) to generate an overall maturity level."};
+  return (
+    <div>
+      <p className="rate-legend">Rate each question from 1 (handled poorly) to 5 (handled excellently). The interface scores the response and assigns an overall maturity level from 1 to 5.</p>
+      {REVIEW_Q.map((q,i) => (
+        <div className="rate-row" key={i}>
+          <div className="rate-q">{q}</div>
+          <div className="rate-btns">
+            {[1,2,3,4,5].map(n => (
+              <button key={n} className={"rate-btn" + (ratings[i]===n ? " sel" : "")} onClick={() => setRating(i, n)}>{n}</button>
+            ))}
+          </div>
+        </div>
+      ))}
+      <div className="sev-result">
+        <div className="sev-result-head">
+          <span className={"sev-badge " + b.cls}>{b.band}</span>
+          <span className="sev-score">{rated.length ? ("Average " + avg.toFixed(1) + " / 5  ·  " + rated.length + " of " + REVIEW_Q.length + " rated") : (REVIEW_Q.length + " questions to rate")}</span>
+        </div>
+        <div className="sev-desc">{b.note}</div>
+      </div>
+    </div>
+  );
+}
+
+/* Reusable click-to-complete checklist used by closure criteria and rehearsal pass criteria */
+function InteractiveChecklist({block}){
+  const items = block.items;
+  const [checked, setChecked] = useState(() => items.map(() => false));
+  const toggle = (i) => setChecked(prev => prev.map((v,idx) => idx===i ? !v : v));
+  const count = checked.filter(Boolean).length;
+  const allDone = count === items.length;
+  return (
+    <div>
+      {items.map((it,i) => (
+        <div className={"chk-item" + (checked[i] ? " on" : "")} key={i} onClick={() => toggle(i)}>
+          <span className="chk-box">{checked[i] ? "✓" : ""}</span>
+          <span className="chk-text">{it}</span>
+        </div>
+      ))}
+      <div className={"chk-status" + (allDone ? " done" : "")}>
+        {allDone ? ("✓ " + block.doneLabel) : (count + " of " + items.length + " complete")}
+      </div>
+    </div>
+  );
+}
+
 const COMPONENTS = {
   detection: DetectionCards,
   triage: TriageChecklist,
@@ -1080,7 +1154,9 @@ const COMPONENTS = {
   comms: Communications,
   roles: RolesResponsibilities,
   recovery: RecoveryTimeline,
-  tree: EscalationTree
+  tree: EscalationTree,
+  review: PostIncidentReview,
+  checklist: InteractiveChecklist
 };
 
 function ChapterBlock({block}){
@@ -1093,10 +1169,11 @@ function ChapterBlock({block}){
     case "tier":  return (
       <React.Fragment>
         <div className="tier-head"><span className="tier-chip">{block.chip}</span>{block.text}</div>
+        {block.desc && <p className="block-p">{block.desc}</p>}
         <ul className="block-ul">{block.items.map((it,i) => <li key={i}>{it}</li>)}</ul>
       </React.Fragment>
     );
-    case "component": { const C = COMPONENTS[block.name]; return C ? <C /> : null; }
+    case "component": { const C = COMPONENTS[block.name]; return C ? <C block={block} /> : null; }
     default: return null;
   }
 }
