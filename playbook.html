@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
-<!-- React via CDN + Babel standalone for JSX (no build step) -->
+<!-- React via CDN + Babel standalone for JSX (no build step, no server, no npm) -->
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -28,6 +28,9 @@
     --red:#E71C57;
     --amber:#E65100;
     --green:#2E7D32;
+    --mon:#4A4A6A;     /* Monitoring level: grey-purple */
+    --bronze:#7B4F2E;  /* Bronze level: warm brown */
+    --silver:#5B4B8A;  /* Silver level: purple */
     --text:#FFFFFF;
     --muted:#9A9AB0;
     --sidebar-w:280px;
@@ -101,9 +104,9 @@
   }
 
   .card{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:22px 24px;margin-bottom:16px;}
-  .section-label{color:var(--orange);font-size:11px;font-weight:600;letter-spacing:1.6px;margin:0 0 12px;}
+  .section-label{color:var(--orange);font-size:11px;font-weight:600;letter-spacing:1.6px;margin:18px 0 12px;}
+  .section-label:first-child{margin-top:0;}
   .block-h{font-size:14px;font-weight:600;color:var(--text);margin:16px 0 8px;}
-  .block-h:first-child{margin-top:0;}
   .block-p{color:var(--muted);font-size:14px;margin:0 0 10px;}
   .block-p b{color:var(--text);font-weight:600;}
   ul.block-ul{margin:0 0 10px;padding:0;list-style:none;}
@@ -122,37 +125,42 @@
   .detect-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
   .detect-text{font-size:13px;color:var(--muted);}
 
-  /* ---------- Triage checklist ---------- */
-  .checklist{margin:4px 0;}
-  .check-item{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--card-border);border-radius:6px;background:var(--bg);padding:11px 14px;margin-bottom:8px;cursor:pointer;user-select:none;transition:border-color .12s;}
-  .check-item:hover{border-color:var(--purple);}
-  .check-box{flex:0 0 auto;width:20px;height:20px;border-radius:5px;border:1px solid var(--card-border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;margin-top:1px;transition:background .12s,border-color .12s;}
-  .check-item.checked .check-box{background:var(--green);border-color:var(--green);}
-  .check-text{font-size:13px;color:var(--text);}
-  .check-item.checked .check-text{color:var(--muted);text-decoration:line-through;}
+  /* ---------- Triage checklist (automated scoring) ---------- */
+  .triage-intro{color:var(--muted);font-size:13px;margin:0 0 12px;}
+  .q-item{border:1px solid var(--card-border);border-radius:6px;background:var(--bg);padding:12px 14px;margin-bottom:9px;}
+  .q-text{font-size:13px;color:var(--text);font-weight:500;margin-bottom:9px;}
+  .q-btns{display:flex;gap:8px;}
+  .q-btn{font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.4px;padding:6px 22px;border-radius:6px;border:1px solid var(--card-border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+  .q-btn:hover{border-color:var(--purple);color:var(--text);}
+  .q-btn.sel{background:var(--purple);border-color:var(--purple);color:#fff;}
 
-  /* ---------- Severity ---------- */
-  .sev-row{display:flex;align-items:flex-start;gap:14px;padding:11px 0;border-top:1px solid var(--card-border);}
-  .sev-row:first-of-type{border-top:none;}
-  .sev-tag{flex:0 0 auto;font-size:11px;font-weight:600;letter-spacing:.5px;color:#fff;border-radius:6px;padding:4px 10px;min-width:34px;text-align:center;}
-  .sev-tag.p1{background:var(--red);}
-  .sev-tag.p2{background:var(--amber);}
-  .sev-tag.p3{background:var(--green);}
-  .sev-text{font-size:13px;color:var(--muted);}
+  .sev-result{margin-top:16px;border:1px solid var(--card-border);border-left:3px solid var(--orange);background:var(--bg);border-radius:6px;padding:16px 18px;}
+  .sev-result-head{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .sev-badge{font-size:13px;font-weight:600;letter-spacing:.5px;color:#fff;border-radius:6px;padding:5px 14px;}
+  .sev-badge.p3{background:var(--mon);}
+  .sev-badge.p2{background:var(--amber);}
+  .sev-badge.p1{background:var(--red);}
+  .sev-score{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .sev-desc{font-size:13px;color:var(--text);}
+  .sev-pending{font-size:13px;color:var(--muted);font-style:italic;}
+  .cta-btn{margin-top:14px;background:var(--orange);border:none;color:#0E0F1A;font-family:inherit;font-size:13px;font-weight:600;padding:10px 18px;border-radius:6px;cursor:pointer;transition:filter .12s;}
+  .cta-btn:hover{filter:brightness(1.08);}
 
-  /* ---------- Status dot ---------- */
-  .dot{flex:0 0 auto;width:12px;height:12px;border-radius:50%;}
-  .dot.green{background:var(--green);}
-  .dot.amber{background:var(--orange);}
-  .dot.red{background:var(--red);}
-  .dot.muted{background:var(--purple);}
+  /* ---------- Tier lists ---------- */
+  .tier-head{font-size:14px;font-weight:600;color:var(--text);margin:16px 0 8px;display:flex;align-items:center;gap:10px;}
+  .tier-chip{font-size:10px;font-weight:600;letter-spacing:.6px;color:#fff;background:var(--purple);border-radius:4px;padding:3px 8px;flex:0 0 auto;}
+
+  /* ---------- Level / P tabs ---------- */
+  .tabs{display:flex;gap:8px;margin:4px 0 16px;flex-wrap:wrap;}
+  .tab-btn{font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.5px;padding:8px 18px;border-radius:6px;border:1px solid var(--card-border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+  .tab-btn:hover{border-color:var(--purple);color:var(--text);}
+  .tab-btn.active{color:#fff;border-color:transparent;}
+  .level-intro{color:var(--muted);font-size:14px;margin:0 0 12px;}
 
   /* ---------- Escalation tree ---------- */
   .tree-sub-label{color:var(--orange);font-size:11px;font-weight:600;letter-spacing:1.6px;margin:4px 0;}
   .tree-title{font-size:16px;font-weight:600;color:var(--text);margin:0 0 4px;}
-  .tree-intro{color:var(--muted);font-size:13px;margin:0 0 16px;}
-  .tree-legend{display:flex;gap:18px;margin:0 0 16px;flex-wrap:wrap;}
-  .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);}
+  .tree-intro{color:var(--muted);font-size:13px;margin:0 0 14px;}
   .tree-controls{display:flex;gap:10px;margin-bottom:16px;}
   .tree-btn{background:var(--card);border:1px solid var(--card-border);color:var(--muted);font-family:inherit;font-size:12px;font-weight:500;padding:7px 14px;border-radius:6px;cursor:pointer;transition:border-color .12s,color .12s;}
   .tree-btn:hover{border-color:var(--purple);color:var(--text);}
@@ -166,7 +174,7 @@
   .node-head:hover .expand-btn{border-color:var(--orange);color:var(--orange);}
   .expand-btn.open{background:var(--purple);border-color:var(--purple);color:#fff;}
   .node-drawer{max-height:0;overflow:hidden;transition:max-height .35s ease;}
-  .node-drawer.open{max-height:8000px;}
+  .node-drawer.open{max-height:9000px;}
   .node-body{padding:0 18px 16px;border-top:1px solid var(--card-border);}
   .actions-label{color:var(--orange);font-size:10px;font-weight:600;letter-spacing:1.4px;margin:14px 0 10px;}
   .action{border:1px solid var(--card-border);border-radius:6px;padding:11px 14px;margin-bottom:8px;background:var(--bg);}
@@ -180,13 +188,10 @@
   .children{margin-left:20px;padding-left:18px;border-left:1px solid var(--card-border);}
 
   /* ---------- Communication flow ---------- */
-  .flow-row{display:flex;align-items:stretch;gap:0;margin:4px 0;flex-wrap:wrap;}
-  .flow-step{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--card-border);border-radius:8px;padding:13px;cursor:pointer;transition:border-color .12s;}
-  .flow-step:hover{border-color:var(--purple);}
-  .flow-step.active{border-color:var(--orange);}
+  .flow-row{display:flex;align-items:stretch;gap:0;margin:4px 0 6px;flex-wrap:wrap;}
+  .flow-step{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--card-border);border-radius:8px;padding:13px;}
   .flow-step-num{width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
   .flow-step-title{font-size:12px;color:var(--text);font-weight:500;line-height:1.35;}
-  .flow-step-who{font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--card-border);}
   .flow-arrow{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:26px;color:var(--orange);font-size:18px;font-weight:600;}
 
   /* ---------- System owner cards ---------- */
@@ -203,12 +208,9 @@
 
   /* ---------- Recovery timeline ---------- */
   .timeline-wrap{margin:4px 0 6px;}
-  .timeline-marks{display:flex;justify-content:space-between;margin-bottom:8px;}
-  .timeline-mark{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
-  .timeline-bar{height:3px;background:var(--card-border);border-radius:2px;margin-bottom:16px;}
   .phase-row{display:flex;align-items:stretch;}
   .phase-block{flex:1;border-radius:8px;padding:12px 10px;cursor:pointer;color:#fff;border:1px solid transparent;transition:filter .12s;text-align:center;}
-  .phase-block:hover{filter:brightness(1.12);}
+  .phase-block:hover{filter:brightness(1.14);}
   .phase-block.active{border-color:var(--orange);}
   .phase-label{font-size:12px;font-weight:600;display:block;}
   .phase-range{font-size:10px;opacity:.85;display:block;margin-top:2px;}
@@ -258,203 +260,346 @@
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useCallback } = React;
+const { useState, useCallback, useContext, createContext } = React;
 
 const SCENARIO = "Loss of Primary Power Supply";
 const TBC_NAME  = "[Name TBC]";
 const TBC_PHONE = "[+971 XX XXX XXXX]";
 const TBC_EMAIL = "[email@dubaiairports.ae]";
 
-/* ===================== GLOSSARY (13 terms) ===================== */
+const LEVELS = ["Monitoring","Bronze","Silver"];
+const LEVEL_COLOR = { Monitoring:"#4A4A6A", Bronze:"#7B4F2E", Silver:"#5B4B8A" };
+const P_TO_LEVEL = { P3:"Monitoring", P2:"Bronze", P1:"Silver" };
+
+/* Navigation context: lets the triage CTA jump to Chapter 4 with a level pre-selected */
+const Nav = createContext({ navigate:()=>{}, preselect:null });
+
+/* ===================== GLOSSARY (14 terms) ===================== */
 const GLOSSARY = [
   ["ATC","Air Traffic Control. The service managing aircraft movement on the ground and in airspace"],
   ["ANSP","Air Navigation Service Provider. The organization that operates ATC"],
   ["BMS","Building Management System. The airport central monitoring system for physical infrastructure including power and cooling"],
-  ["Bronze tier","The IT technical response team. First to activate in any incident"],
+  ["Bronze tier","Medium-impact response level declared by Operations. BT team executes pre-authorized Bronze decisions"],
+  ["BT team","The digital and technology team responsible for IT systems at the airport"],
   ["CRAC","Computer Room Air Conditioning. The cooling units in the data center"],
   ["CCTV","Closed-Circuit Television. The security camera system"],
   ["DCS","Departure Control System. The IT system managing flight departures"],
   ["DEWA","Dubai Electricity and Water Authority. The primary power grid supplier"],
-  ["Gold tier","Executive leadership including CEO, COO, and CFO. Activated only for the highest severity decisions"],
-  ["NOC","Network Operations Center. The IT team monitoring all systems 24 hours a day"],
+  ["DRP","Disaster Recovery Plan. A documented procedure for restoring a specific system after a failure"],
+  ["Monitoring","Steady-state response level. Low threat, low impact. BT team handles incidents independently within SLA"],
   ["SCADA","Supervisory Control and Data Acquisition. Industrial monitoring for power distribution equipment"],
-  ["Silver tier","Cross-functional response team including all system owners, airlines, and operational stakeholders"],
+  ["Silver tier","High-impact response level declared by Operations. Includes all system owners, stakeholders, airlines, and external agencies. BT team lead attends as IT representative"],
   ["UPS","Uninterruptible Power Supply. Battery system that bridges the gap between grid power loss and generator startup"]
 ];
 
 /* ===================== Ch 02 data ===================== */
 const DETECTION = [
-  {icon:"monitor", title:"NOC Dashboards", text:"Mass service degradation visible in monitoring tools. Services drop off the network almost immediately."},
-  {icon:"bell", title:"BMS and SCADA Alert", text:"Building Management System and SCADA send power failure alerts to the Facilities Control Room. IT team receives a notification from Facilities."},
-  {icon:"phone", title:"Direct Notification", text:"Facilities team or Terminal Operations calls the IT team directly to report power loss."}
+  {icon:"monitor", title:"BT Dashboards", text:"Mass service degradation visible in monitoring tools. Services drop off the network almost immediately."},
+  {icon:"bell", title:"BMS and SCADA Alert", text:"Building Management System and SCADA send power failure alerts to the Facilities Control Room. BT team receives a notification from Facilities."},
+  {icon:"phone", title:"Direct Notification", text:"Facilities team or Terminal Operations contacts the BT team directly to report power loss."}
 ];
-const TRIAGE = [
-  "Confirm power loss is not isolated to a single system or zone",
-  "Confirm generator status via Facilities Control Room",
-  "Identify which IT systems are showing degradation on dashboards",
-  "Estimate likely duration based on available information",
-  "Assign severity level based on the criteria below"
+
+/* Each triage question scores points only when answered with the listed trigger answer */
+const TRIAGE_Q = [
+  {q:"Is power loss confirmed across more than one zone?", scoreOn:"Yes", points:1},
+  {q:"Is the backup generator confirmed running?", scoreOn:"No", points:2},
+  {q:"Is any Tier 0 system showing degradation on dashboards?", scoreOn:"Yes", points:3},
+  {q:"Is the estimated duration of the outage more than 2 hours?", scoreOn:"Yes", points:2},
+  {q:"Is the data center temperature rising?", scoreOn:"Yes", points:3}
 ];
-const SEVERITY = [
-  {tag:"P3", cls:"p3", text:"Single system or zone affected, generator confirmed running, no critical IT system impacted. IT team monitors"},
-  {tag:"P2", cls:"p2", text:"Multiple IT systems affected, generator status unclear, at least one critical system impacted. Bronze team reviews"},
-  {tag:"P1", cls:"p1", text:"Data center at risk, critical IT system degrading, or full airport impact confirmed. Bronze team activates immediately"}
-];
+function severityFor(score){
+  if(score >= 6) return {p:"P1", cls:"p1", text:"Critical systems at risk. BT team activates immediately. BT team lead notifies Silver tier"};
+  if(score >= 3) return {p:"P2", cls:"p2", text:"Multiple systems affected. BT team reviews and contacts relevant system owners"};
+  return {p:"P3", cls:"p3", text:"Single system or zone affected. BT team monitors internally. No escalation required"};
+}
+
+/* ===================== Ch 04 data ===================== */
+const PREAUTH = {
+  Monitoring:{
+    intro:"Monitoring is the steady state. Incidents are within SLA. BT team handles independently with no escalation.",
+    auth:[
+      "Resolve service disruptions that are within SLA without escalation",
+      "Notify the relevant system owner if a passenger-facing system is degraded",
+      "Send announcements via the PA system owner if a visible passenger-facing issue requires communication",
+      "Log all incidents and resolutions in the incident management system"
+    ],
+    examplesLabel:"Examples of Monitoring-level incidents in this scenario",
+    examples:[
+      "Parking spot display system offline",
+      "Non-critical passenger information screen offline",
+      "Minor service degradation in retail or Wi-Fi systems"
+    ]
+  },
+  Bronze:{
+    intro:"Bronze is declared by Operations when impact is medium. BT team executes the following pre-authorized decisions immediately.",
+    auth:[
+      "Execute Tier 2 shutdown: cut passenger and staff Wi-Fi, non-critical office IT, and retail systems",
+      "Initiate failover to secondary data center if data center cooling is at risk",
+      "Confirm which Tier 0 systems are operational and document current status",
+      "Notify system owners of any confirmed or potential impact to their systems",
+      "Use personal mobile phones if internal communications are unavailable"
+    ]
+  },
+  Silver:{
+    intro:"Silver is declared by Operations when impact is high. This assumes a long-term or severe outage. BT team executes the following pre-authorized decisions immediately.",
+    auth:[
+      "Execute Tier 1 shutdown in addition to Tier 2: shed terminal and airfield lighting (except emergency), access control systems on non-critical zones, staff collaboration tools",
+      "Move non-critical workloads to cloud infrastructure to reduce data center load and maximize cooling capacity",
+      "Shut down all systems except Tier 0 to extend generator runtime",
+      "BT team lead escalates to Silver tier with full technical status report",
+      "Coordinate with Silver tier on airport-wide shutdown decision if Tier 0 systems cannot be sustained"
+    ],
+    note:"Shutting down Tier 1 systems at Silver level requires pre-agreement from the relevant business-side system owners. This agreement must be obtained during preparation, before any incident occurs."
+  }
+};
 
 /* ===================== Ch 05 data ===================== */
-const FLOW = [
-  {title:"IT team detects the issue via dashboards or notification", who:"IT team, supported by the Facilities Control Room"},
-  {title:"IT team assesses severity and assigns P1, P2, or P3", who:"IT team, confirmed by Bronze team lead"},
-  {title:"Bronze team contacts the relevant system owners", who:"Bronze team and the affected system owners"},
-  {title:"Bronze team lead escalates to Silver tier if the P1 threshold is met", who:"Bronze team lead and Silver tier"}
-];
+const COMMS = {
+  P3:{
+    level:"Monitoring",
+    plan:[
+      "BT team monitors internally",
+      "If a system owner's system shows early signs of degradation, BT team proactively notifies them",
+      "No escalation to Silver tier required"
+    ],
+    flow:["BT team detects issue","Notifies relevant system owner"]
+  },
+  P2:{
+    level:"Bronze",
+    plan:[
+      "BT team contacts system owners of all impacted or at-risk systems",
+      "Message covers which system is affected, current status, and what BT team is doing",
+      "BT team lead logs all contacts made and responses received"
+    ],
+    flow:["BT team detects issue","Assesses as P2","Contacts relevant system owners","BT team lead logs all contact"]
+  },
+  P1:{
+    level:"Silver",
+    plan:[
+      "BT team contacts all Tier 0 system owners immediately",
+      "BT team lead notifies Silver tier",
+      "System owners receive a status update every 30 minutes until the incident is resolved"
+    ],
+    flow:["BT team detects issue","Assesses as P1","Contacts all Tier 0 system owners","BT team lead notifies Silver tier"]
+  }
+};
+
+/* category drives which P level a card appears on:
+   P3 -> BT-side only | P2 -> BT-side, Business-side, Vendor | P1 -> all */
 const OWNERS = [
-  ["CCTV System Owner","CCTV zones are offline or at risk"],
-  ["ATC Communications Interface Owner","ATC interface is degraded or offline"],
-  ["Network Lead","core network backbone is affected"],
-  ["Infrastructure Lead","data center cooling is at risk or failover is needed"],
-  ["Baggage Systems Owner","baggage handling systems are offline"],
-  ["Terminal IT","passenger information displays are offline"],
-  ["Ground Handling IT Liaison","ground handling communications are affected"],
-  ["Access Control Systems Owner","access control systems are offline or at risk"],
-  ["PA System Owner","emergency public address system is at risk"]
+  ["CCTV System Owner","BT-side","CCTV zones are offline or at risk"],
+  ["CCTV Business Owner","Business-side","CCTV zones are offline and a business decision is required"],
+  ["ATC Communications Interface Owner","BT-side","ATC interface is degraded or offline"],
+  ["Network Lead","BT-side","core network backbone is affected"],
+  ["Infrastructure Lead","BT-side","data center cooling is at risk or failover is needed"],
+  ["Baggage Systems Owner","BT-side","baggage handling systems are offline"],
+  ["Baggage Systems Business Owner","Business-side","baggage systems are offline and operations decision needed"],
+  ["Terminal IT","BT-side","passenger information displays are offline"],
+  ["Ground Handling IT Liaison","BT-side","ground handling communications are affected"],
+  ["Access Control Systems Owner","BT-side","access control systems are offline or at risk"],
+  ["PA System Owner","BT-side","emergency public address system is at risk"],
+  ["Power vendor","Vendor","grid failure is confirmed and vendor liaison is required"],
+  ["Silver tier coordinator","Other","P1 declared, BT team lead notifies Silver tier"]
 ];
+const OWNER_CATS_BY_P = {
+  P3:["BT-side"],
+  P2:["BT-side","Business-side","Vendor"],
+  P1:["BT-side","Business-side","Vendor","Other"]
+};
+
+/* ===================== Ch 06 data ===================== */
+const ROLES = {
+  Monitoring:[
+    {role:"BT team", items:[
+      "Monitor all systems and dashboards continuously",
+      "Resolve incidents within SLA independently",
+      "Notify relevant system owner if a passenger-facing system is degraded",
+      "Log all incidents and resolutions"
+    ]}
+  ],
+  Bronze:[
+    {role:"BT team lead", items:[
+      "Confirmed as single point of accountability for all BT decisions",
+      "Oversees execution of pre-authorized Bronze level decisions",
+      "Logs all system owner contacts and responses"
+    ]},
+    {role:"BT team", items:[
+      "Executes Tier 2 shutdown immediately",
+      "Confirms Tier 0 system status and reports to BT team lead",
+      "Contacts system owners of impacted systems",
+      "Monitors data center temperature continuously"
+    ]}
+  ],
+  Silver:[
+    {role:"BT team lead", items:[
+      "Attends Silver tier calls as BT representative",
+      "Provides technical status updates to Silver tier when requested",
+      "Oversees execution of pre-authorized Silver level decisions",
+      "Coordinates with Silver tier on airport-wide decisions"
+    ]},
+    {role:"BT team", items:[
+      "Executes Tier 1 and Tier 2 shutdown",
+      "Moves non-critical workloads to cloud infrastructure",
+      "Notifies all system owners of status every 30 minutes",
+      "Maintains IT service log with hourly updates"
+    ]},
+    {role:"Silver tier (for BT team reference)", items:[
+      "Activated by Operations, not by BT",
+      "Includes all system owners, operational stakeholders, airlines, and external agencies",
+      "BT team lead is the sole BT representative at Silver tier"
+    ]}
+  ]
+};
 
 /* ===================== Ch 07 data ===================== */
-const TIMELINE_MARKS = ["T+0","T+30min","T+1h","T+2h","T+4h","T+6h","T+8h+"];
-const PHASES = [
-  {label:"Phase 0", range:"T+0", color:"#13152A", title:"Power stability gate",
-   systems:["Power stability confirmed","Bronze team lead calls go/no-go","No IT recovery begins until this gate is cleared"], approver:"Bronze team lead"},
-  {label:"Phase 1", range:"T+0 to T+2h", color:"#5B4B8A", title:"Restore Tier 1 systems",
-   systems:["ATC communications interfaces","CCTV systems","Core network backbone","Data center and cooling","Fire alarm and suppression monitoring","NOC infrastructure"], approver:"Bronze team lead"},
-  {label:"Phase 2", range:"T+2h to T+4h", color:"#6E5CA8", title:"Restore Tier 2 systems",
-   systems:["Terminal and airfield lighting","Emergency public address system","Access control systems","Staff communication systems","Perimeter security systems"], approver:"Bronze team lead"},
-  {label:"Phase 3", range:"T+4h to T+6h", color:"#8A79C4", title:"Restore Tier 3 systems",
-   systems:["Passenger and staff Wi-Fi","Non-critical office IT","Retail systems"], approver:"Bronze team lead"},
-  {label:"Phase 4", range:"T+6h+", color:"#2E7D32", title:"Full recovery confirmed",
-   systems:["Full recovery confirmed","Bronze team lead signs off IT recovery","Operational recovery signed off by Airport Operations Director"], approver:"Bronze team lead"}
+const RECOVERY = {
+  Monitoring:[
+    {label:"Phase 0", range:"Go/no-go", title:"Confirm power is stable", systems:["BT team lead go/no-go"], approver:"BT team lead"},
+    {label:"Phase 1", range:"Restore", title:"Restore any Tier 2 systems that were shed", systems:["Validate before proceeding"], approver:"BT team lead"},
+    {label:"Phase 2", range:"Sign-off", title:"Confirm all systems are back to normal state", systems:["BT team lead sign-off"], approver:"BT team lead"}
+  ],
+  Bronze:[
+    {label:"Phase 0", range:"Go/no-go", title:"Confirm power is stable", systems:["BT team lead go/no-go"], approver:"BT team lead"},
+    {label:"Phase 1", range:"T+0 to T+2h", title:"Validate all Tier 0 systems operational", systems:["Confirm all Tier 0 systems operational"], approver:"BT team lead"},
+    {label:"Phase 2", range:"T+2h to T+4h", title:"Restore Tier 1 systems", systems:["Validate before proceeding"], approver:"BT team lead"},
+    {label:"Phase 3", range:"T+4h to T+6h", title:"Restore Tier 2 systems", systems:["Passenger and staff Wi-Fi","Non-critical office IT","Retail systems"], approver:"BT team lead"},
+    {label:"Phase 4", range:"Sign-off", title:"Full recovery confirmed", systems:["BT team lead sign-off"], approver:"BT team lead"}
+  ],
+  Silver:[
+    {label:"Phase 0", range:"Go/no-go", title:"Confirm power is stable and sustained", systems:["BT team lead go/no-go","Silver tier notified"], approver:"BT team lead"},
+    {label:"Phase 1", range:"T+0 to T+2h", title:"Validate all Tier 0 systems operational", systems:["ATC comms","CCTV","Core network","Data center","Fire monitoring"], approver:"BT team lead"},
+    {label:"Phase 2", range:"T+2h to T+4h", title:"Restore Tier 1 systems", systems:["Terminal lighting","PA system","Access control","Staff comms","Perimeter security"], approver:"BT team lead"},
+    {label:"Phase 3", range:"T+4h to T+6h", title:"Restore Tier 2 systems", systems:["Wi-Fi","Office IT","Retail"], approver:"BT team lead"},
+    {label:"Phase 4", range:"T+6h+", title:"Full recovery confirmed", systems:["BT team lead and Airport Operations Director sign off","Silver tier notified of closure"], approver:"BT team lead"}
+  ]
+};
+const DRP_REFS = [
+  "CCTV DRP: [reference document location TBC]",
+  "ATC communications interface DRP: [reference document location TBC]",
+  "Core network DRP: [reference document location TBC]",
+  "Data center DRP: [reference document location TBC]",
+  "Baggage systems DRP: [reference document location TBC]"
 ];
 
 /* ===================== Escalation tree ===================== */
 const a = (text, role, contact=false) => ({ text, role, contact });
 
-// shared Branch 4 pattern: detect, notify owner, document, escalate if needed
-const svcNode = (id, title, system, ownerLabel) => ({
-  id, title, status:"amber", actions:[
-    a("Detect " + system + " degradation on IT dashboards","IT team"),
-    a("Notify the " + ownerLabel + " immediately","IT team", true),
-    a("Document the time and current status","IT team"),
-    a("Bronze team lead notifies Silver tier if the system cannot be restored and airport operations are impacted","Bronze team lead")
+/* Branch 4 shared pattern: detect, notify owner, document, escalate if not restored */
+const svcNode = (id, title, system) => ({
+  id, title, actions:[
+    a("Detect " + system + " on BT dashboards","BT team"),
+    a("Notify the relevant system owner","BT team", true),
+    a("Document the time and current status","BT team"),
+    a("BT team lead notifies Silver tier if the system cannot be restored","BT team lead")
   ], children:[]
 });
 
 const TREE = {
-  id:"root", title:"Loss of Primary Power Supply", status:"red",
+  id:"root", title:"Loss of Primary Power Supply",
   actions:[
-    a("IT team assesses severity and assigns P1, P2, or P3","IT team"),
-    a("Execute Tier 3 IT shutdown immediately","IT team"),
-    a("Document all affected systems and current status","IT team"),
-    a("Assess and confirm which Tier 1 systems are operational","IT team"),
-    a("Notify system owners if any Tier 1 system is confirmed down or at risk","Bronze team lead", true),
-    a("Use personal mobile phones if internal communications are unavailable","All IT staff")
+    a("Assess severity using the triage checklist in Chapter 2 and assign P1, P2, or P3","BT team"),
+    a("Execute Tier 2 shutdown immediately","BT team"),
+    a("Document all affected systems and current status","BT team"),
+    a("Confirm which Tier 0 systems are operational","BT team"),
+    a("Notify system owners if any Tier 0 system is confirmed down or at risk","BT team lead", true),
+    a("Switch to personal mobile phones if internal communications are unavailable","All BT staff")
   ],
   children:[
     {
-      id:"branch-1", title:"Branch 1: Generator stops working", status:"muted", actions:[],
+      id:"branch-1", title:"Branch 1: Generator stops working", actions:[],
       children:[
-        {id:"1a", title:"Generator starts successfully", status:"green", actions:[
-          a("Confirm all Tier 1 IT systems are on generator feed and operational","IT team"),
-          a("Monitor data center temperature and log every 15 minutes","IT team"),
-          a("Confirm Tier 2 systems status and report to Bronze team lead","IT team"),
-          a("Maintain Tier 3 shutdown until power is confirmed stable","Bronze team lead"),
-          a("Update all system owners on current IT status","IT team")
+        {id:"1a", title:"Generator starts successfully", actions:[
+          a("Confirm all Tier 0 systems are operational","BT team"),
+          a("Monitor data center temperature every 15 minutes","BT team"),
+          a("Confirm Tier 1 system status and report to BT team lead","BT team"),
+          a("Maintain Tier 2 shutdown","BT team lead"),
+          a("Update all system owners on current status","BT team")
         ], children:[]},
-        {id:"1b", title:"Generator fails to start", status:"red", actions:[
-          a("Escalate to Bronze team lead immediately","IT team"),
-          a("Calculate remaining UPS runtime and report to Bronze team lead","IT team"),
-          a("Initiate failover to secondary data center immediately","IT team", true),
-          a("Alert all system owners that power is critically at risk","Bronze team lead"),
-          a("Begin controlled shutdown of all non-Tier 1 systems in priority order","IT team")
+        {id:"1b", title:"Generator fails to start", actions:[
+          a("Escalate to BT team lead immediately","BT team"),
+          a("Calculate remaining UPS runtime and report to BT team lead","BT team"),
+          a("Initiate failover to secondary data center immediately","BT team", true),
+          a("Alert all system owners that power is critically at risk","BT team lead"),
+          a("Begin controlled shutdown of all non-Tier 0 systems in priority order","BT team")
         ], children:[]},
-        {id:"1c", title:"UPS exhausted with no generator", status:"red", actions:[
-          a("Execute emergency shutdown of all non-safety systems in tier order","IT team"),
-          a("Confirm which Tier 1 systems are still operational and document","IT team"),
-          a("Notify all system owners their systems are offline or going offline","Bronze team lead"),
-          a("Bronze team lead escalates to Silver tier immediately","Bronze team lead", true)
+        {id:"1c", title:"UPS exhausted with no generator", actions:[
+          a("Execute emergency shutdown of all non-Tier 0 systems","BT team"),
+          a("Confirm which Tier 0 systems are still operational and document","BT team"),
+          a("Notify all system owners their systems are offline or going offline","BT team lead"),
+          a("BT team lead escalates to Silver tier immediately","BT team lead", true)
         ], children:[]}
       ]
     },
     {
-      id:"branch-2", title:"Branch 2: Data center cooling at risk", status:"muted", actions:[],
+      id:"branch-2", title:"Branch 2: Data center cooling at risk", actions:[],
       children:[
-        {id:"2a", title:"Failover to secondary data center succeeds", status:"green", actions:[
-          a("Monitor secondary data center capacity and performance","IT team"),
-          a("Confirm all Tier 1 services are accessible from secondary data center","IT team"),
-          a("Notify system owners their services are running from the secondary data center","IT team"),
-          a("Plan failback for a low-traffic window after full recovery","Bronze team lead")
+        {id:"2a", title:"Failover to secondary data center succeeds", actions:[
+          a("Monitor secondary data center capacity and performance","BT team"),
+          a("Confirm all Tier 0 services are accessible from secondary data center","BT team"),
+          a("Notify system owners their services are running from the secondary data center","BT team"),
+          a("Plan failback for a low-traffic window after full recovery","BT team lead")
         ], children:[]},
-        {id:"2b", title:"Failover fails or secondary data center unavailable", status:"red", actions:[
-          a("Notify Bronze team lead immediately","IT team"),
-          a("Identify which Tier 1 services can be manually sustained","IT team"),
-          a("Notify all affected system owners their services will be offline","Bronze team lead"),
-          a("Document all impacted services and time of impact","IT team"),
-          a("Bronze team lead escalates to Silver tier","Bronze team lead")
+        {id:"2b", title:"Failover fails or secondary data center unavailable", actions:[
+          a("Notify BT team lead immediately","BT team"),
+          a("Identify which Tier 0 services can be manually sustained","BT team"),
+          a("Notify all affected system owners their services will be offline","BT team lead"),
+          a("Document all impacted services and time of impact","BT team"),
+          a("BT team lead escalates to Silver tier","BT team lead")
         ], children:[]}
       ]
     },
     {
-      id:"branch-3", title:"Branch 3: Tier 1 systems impacted", status:"muted", actions:[],
+      id:"branch-3", title:"Branch 3: Tier 0 systems impacted", actions:[],
       children:[
-        {id:"3a", title:"CCTV offline", status:"red", actions:[
-          a("Detect CCTV degradation on IT dashboards","IT team"),
-          a("Notify CCTV system owner immediately with confirmed affected zones","IT team", true),
-          a("Document which zones are offline and at what time","IT team"),
-          a("Confirm system owner has acknowledged the notification","IT team")
+        {id:"3a", title:"CCTV offline", actions:[
+          a("Detect CCTV degradation on BT dashboards","BT team"),
+          a("Notify CCTV system owner immediately with confirmed affected zones","BT team", true),
+          a("Document which zones are offline and at what time","BT team"),
+          a("Confirm system owner has acknowledged the notification","BT team")
         ], children:[]},
-        {id:"3b", title:"ATC communications interface degraded", status:"red", actions:[
-          a("Detect ATC interface degradation on IT dashboards","IT team"),
-          a("Notify ATC communications system owner immediately","IT team", true),
-          a("Notify Bronze team lead of ATC interface status","IT team"),
-          a("Document interface status and degradation timeline","IT team")
+        {id:"3b", title:"ATC communications interface degraded", actions:[
+          a("Detect ATC interface degradation on BT dashboards","BT team"),
+          a("Notify ATC communications system owner immediately","BT team", true),
+          a("Notify BT team lead of ATC interface status","BT team"),
+          a("Document interface status and degradation timeline","BT team")
         ], children:[]},
-        {id:"3c", title:"Core network backbone fails", status:"red", actions:[
-          a("Identify which network segments are affected and which are isolated","IT team"),
-          a("Notify Bronze team lead of full scope of network failure","IT team"),
-          a("Notify all system owners that IT network connectivity is lost","Bronze team lead"),
-          a("Switch all communications to personal mobile phones","Bronze team lead"),
-          a("Assess whether secondary data center network connection is intact","IT team")
+        {id:"3c", title:"Core network backbone fails", actions:[
+          a("Identify which network segments are affected","BT team"),
+          a("Notify BT team lead of full scope of network failure","BT team"),
+          a("Notify all system owners that network connectivity is lost","BT team lead"),
+          a("Switch all communications to personal mobile phones","BT team lead"),
+          a("Assess whether secondary data center network connection is intact","BT team")
         ], children:[]}
       ]
     },
     {
-      id:"branch-4", title:"Branch 4: IT services disrupted", status:"muted", actions:[],
+      id:"branch-4", title:"Branch 4: IT services disrupted", actions:[],
       children:[
-        svcNode("4a","Departure Control System offline","Departure Control System","Departure Control System owner"),
-        svcNode("4b","Baggage systems offline","baggage handling system","baggage systems owner"),
-        svcNode("4c","Passenger displays offline","passenger information display","terminal IT system owner"),
-        {id:"4d", title:"Internal communications down", status:"amber", actions:[
-          a("Switch all IT staff to personal mobile phones immediately","Bronze team lead"),
-          a("Notify all system owners via personal phone that internal comms are down","IT team"),
-          a("Log time of communications failure","IT team")
+        svcNode("4a","Baggage systems offline","baggage handling degradation"),
+        svcNode("4b","Passenger displays offline","passenger information display degradation"),
+        {id:"4c", title:"Internal communications down", actions:[
+          a("Switch all BT staff to personal mobile phones immediately","BT team lead"),
+          a("Notify all system owners via personal phone that internal comms are down","BT team"),
+          a("Log time of communications failure","BT team")
         ], children:[]}
       ]
     },
     {
-      id:"branch-5", title:"Branch 5: Outage extends beyond 8 hours", status:"muted", actions:[],
+      id:"branch-5", title:"Branch 5: Outage extends beyond 8 hours", actions:[],
       children:[
-        {id:"5a", title:"Recovery plan activated", status:"amber", actions:[
-          a("Conduct full IT service review and document every system status","Bronze team lead"),
-          a("Assess secondary data center capacity for extended operation","IT team"),
-          a("Notify all system owners of extended outage and current IT service status","IT team"),
-          a("Begin structured IT recovery plan preparation","Bronze team lead"),
-          a("Maintain IT service log with updates every hour","IT team")
+        {id:"5a", title:"Recovery plan activated", actions:[
+          a("Conduct full IT service review and document every system status","BT team lead"),
+          a("Assess secondary data center capacity for extended operation","BT team"),
+          a("Notify all system owners of extended outage and current status","BT team"),
+          a("Begin structured IT recovery plan preparation","BT team lead"),
+          a("Maintain IT service log with updates every hour","BT team")
         ], children:[]},
-        {id:"5b", title:"Multi-day recovery required", status:"red", actions:[
-          a("Execute phased IT recovery plan: Tier 1 first, then Tier 2, then Tier 3","Bronze team lead"),
-          a("Validate each tier before restoring the next","Bronze team lead"),
-          a("Notify all system owners of restoration sequence and estimated timelines","IT team"),
-          a("Schedule failback to primary data center in a dedicated low-traffic window","IT team"),
-          a("Begin post-incident review preparation and collect all logs and timestamps","IT team")
+        {id:"5b", title:"Multi-day recovery required", actions:[
+          a("Execute phased recovery plan: Tier 0 first, then Tier 1, then Tier 2","BT team lead"),
+          a("Validate each tier before restoring the next","BT team lead"),
+          a("Notify all system owners of restoration sequence and estimated timelines","BT team"),
+          a("Schedule failback to primary data center in a dedicated low-traffic window","BT team"),
+          a("Begin post-incident review preparation and collect all logs and timestamps","BT team")
         ], children:[]}
       ]
     }
@@ -469,8 +614,8 @@ const CHAPTERS = [
     num:"01", id:"scenario-overview", title:"Scenario Overview",
     blocks:[
       {t:"label", text:"SCENARIO DESCRIPTION"},
-      {t:"p", text:"Primary power failure causes a progressive loss of IT services across the airport. The IT response focuses on protecting critical systems, assessing the impact on each system owner, and managing a controlled recovery once power is restored. The physical cause of the outage is handled by Facilities Engineering."},
-      {t:"h", text:"Examples of what can trigger this scenario"},
+      {t:"p", text:"Primary power failure causes a progressive loss of IT services across the airport. The BT team response focuses on protecting critical systems, assessing the impact on each system owner, and managing a controlled recovery once power is restored. The physical cause of the outage is handled by Facilities Engineering."},
+      {t:"h", text:"Scenario triggers"},
       {t:"ul", items:[
         "Grid failure from the utility provider",
         "Physical damage to power infrastructure",
@@ -488,16 +633,6 @@ const CHAPTERS = [
         "Baggage handling systems",
         "Passenger and staff Wi-Fi",
         "Ground handling communications"
-      ]},
-      {t:"label", text:"KEY ASSUMPTIONS"},
-      {t:"ul", items:[
-        "One backup generator is available at the airport",
-        "The generator provides approximately 24 to 48 hours of runtime on a full fuel tank",
-        "UPS systems bridge approximately 10 to 30 minutes while the generator spins up",
-        "The primary power grid is supplied by DEWA",
-        "A secondary data center is available if the primary site is at risk",
-        "Data center cooling units are on the generator feed",
-        "Staff are permitted to use personal mobile phones for work communication if internal systems are unavailable"
       ]}
     ]
   },
@@ -506,171 +641,87 @@ const CHAPTERS = [
     blocks:[
       {t:"label", text:"DETECTION SIGNALS"},
       {t:"component", name:"detection"},
-      {t:"label", text:"TRIAGE"},
-      {t:"p", text:"Before Bronze team activates, the IT team runs a rapid assessment of no more than 5 minutes to confirm scope and likely duration."},
-      {t:"component", name:"triage"},
-      {t:"label", text:"SEVERITY LEVELS"},
-      {t:"p", text:"Severity levels are assigned by the IT team during triage. Bronze, Silver, and Gold tiers are declared by Operations, not by IT. IT uses P1, P2, and P3 internally to determine the pace and scope of its own response."},
-      {t:"component", name:"severity"}
+      {t:"label", text:"TRIAGE AND SEVERITY ASSESSMENT"},
+      {t:"component", name:"triage"}
     ]
   },
   {
     num:"03", id:"containment", title:"Containment Actions",
     blocks:[
       {t:"label", text:"IT SHUTDOWN PRIORITY"},
-      {t:"p", text:"When power is lost, IT cannot sustain all systems on backup generator capacity. Systems are pre-classified into three tiers based on operational criticality. This classification must be validated with Facilities Engineering against actual generator load capacity before use."},
-      {t:"h", text:"Tier 1: must stay running at all costs, assumed to be on generator feed"},
-      {t:"ul", items:[
+      {t:"p", text:"When power is lost, IT systems are prioritized based on operational criticality. The BT team follows this classification to determine which systems to protect and which to shed."},
+      {t:"tier", chip:"TIER 0", text:"Must stay running at all times", items:[
         "ATC communications interfaces",
         "CCTV systems",
         "Core network backbone",
         "Data center and cooling systems",
         "Fire alarm and suppression monitoring",
-        "NOC infrastructure"
+        "BT team infrastructure"
       ]},
-      {t:"h", text:"Tier 2: maintain if generator capacity allows"},
-      {t:"ul", items:[
+      {t:"tier", chip:"TIER 1", text:"Maintain to keep the airport safe and navigable", items:[
         "Terminal and airfield lighting",
         "Emergency public address system",
         "Access control systems",
         "Staff communication systems",
         "Perimeter security systems"
       ]},
-      {t:"h", text:"Tier 3: shed immediately to preserve capacity for Tier 1 and Tier 2"},
-      {t:"ul", items:[
+      {t:"tier", chip:"TIER 2", text:"Shed to preserve capacity for Tier 0 and Tier 1", items:[
         "Passenger and staff Wi-Fi",
         "Non-critical office IT",
         "Retail systems"
       ]},
-      {t:"label", text:"DATA CENTER"},
-      {t:"p", text:"If data center cooling is at risk, IT initiates failover to the secondary data center before temperatures reach a critical threshold. Do not wait for an alarm. Act when the risk is identified. Once on the secondary data center, do not switch back until the incident is fully resolved."},
       {t:"component", name:"tree"}
     ]
   },
   {
     num:"04", id:"pre-authorized", title:"Pre-Authorized Decisions",
     blocks:[
-      {t:"p", text:"The following decisions are pre-authorized based on the tier structure in Chapter 3. Bronze team can act on these immediately without waiting for Silver or Gold activation."},
-      {t:"label", text:"BRONZE TEAM ACTS IMMEDIATELY"},
-      {t:"ul", items:[
-        "Execute Tier 3 IT shutdown",
-        "Initiate failover to secondary data center if cooling is at risk",
-        "Assess which Tier 1 systems are operational and document current status",
-        "Notify system owners directly if their Tier 1 system is confirmed down or at risk",
-        "Use personal mobile phones if internal communications are unavailable"
-      ]},
-      {t:"label", text:"REQUIRES BRONZE TEAM LEAD APPROVAL"},
-      {t:"ul", items:[
-        "Shutting down any Tier 2 system ahead of schedule",
-        "Deviating from the pre-agreed IT shutdown priority list",
-        "Notifying system owners of potential Tier 2 impact"
-      ]},
-      {t:"label", text:"REQUIRES ESCALATION TO SILVER TIER"},
-      {t:"ul", items:[
-        "Any Tier 1 system confirmed down with no recovery timeline",
-        "P1 incident where airport shutdown is likely",
-        "Extended outage where IT cannot confirm a recovery window"
-      ]}
+      {t:"p", text:"Pre-authorized decisions define what the BT team is allowed to do at each response level without waiting for additional approval. The response level is declared by Operations, not by BT."},
+      {t:"component", name:"preauth"}
     ]
   },
   {
     num:"05", id:"communications", title:"Communications",
     blocks:[
-      {t:"label", text:"COMMUNICATION PLAN BY PRIORITY LEVEL"},
-      {t:"h", text:"P3"},
-      {t:"ul", items:[
-        "IT team monitors internally",
-        "If a system owner's system shows early signs of degradation, IT proactively notifies them before the issue escalates",
-        "No escalation to Silver tier required"
-      ]},
-      {t:"h", text:"P2"},
-      {t:"ul", items:[
-        "Bronze team contacts system owners of all impacted or at-risk systems",
-        "Message covers which system is affected, current status, and what IT is doing about it",
-        "Bronze team lead logs all contacts made and responses received"
-      ]},
-      {t:"h", text:"P1"},
-      {t:"ul", items:[
-        "Bronze team contacts all Tier 1 system owners immediately",
-        "Bronze team lead notifies Silver tier if any Tier 1 system is confirmed down, recovery timeline is unknown, or airport shutdown is becoming likely",
-        "System owners receive a status update every 30 minutes until the incident is resolved"
-      ]},
-      {t:"label", text:"COMMUNICATION FLOW"},
-      {t:"component", name:"flow"},
-      {t:"label", text:"SYSTEM OWNER CONTACTS"},
-      {t:"component", name:"owners"},
-      {t:"label", text:"FALLBACK COMMUNICATIONS"},
-      {t:"ul", items:[
-        "If internal communications (office phones, Teams, Slack) are unavailable, all IT staff use personal mobile phones",
-        "This is an assumed permission, see Chapter 1 assumptions"
-      ]}
+      {t:"component", name:"comms"}
     ]
   },
   {
-    num:"06", id:"roles", title:"Roles and Decision Rights",
+    num:"06", id:"roles", title:"Roles and Responsibilities",
     blocks:[
-      {t:"p", text:"This chapter outlines the stakeholders involved in the response and their decision rights."},
-      {t:"label", text:"BRONZE TIER"},
-      {t:"h", text:"Bronze team lead"},
-      {t:"ul", items:[
-        "Single point of accountability for all IT decisions during the incident",
-        "Assesses severity level during triage and confirms P1, P2, or P3",
-        "Only IT representative who communicates with Silver tier",
-        "Decides when to escalate to Silver tier"
-      ]},
-      {t:"h", text:"IT team"},
-      {t:"ul", items:[
-        "Monitors all systems and documents affected services",
-        "Contacts system owners when instructed by Bronze team lead",
-        "Executes the shutdown and recovery plans"
-      ]},
-      {t:"label", text:"SILVER TIER"},
-      {t:"ul", items:[
-        "Activated by Operations, not by IT",
-        "Bronze team lead attends Silver tier calls as the IT representative",
-        "Provides technical status updates when requested",
-        "Includes all system owners and operational stakeholders including airlines"
-      ]},
-      {t:"label", text:"GOLD TIER"},
-      {t:"ul", items:[
-        "Activated only for the highest severity decisions, directed by Silver tier",
-        "Bronze team lead does not escalate to Gold independently"
-      ]},
-      {t:"label", text:"DECISION RIGHTS"},
-      {t:"ul", items:[
-        "<b>P1, P2, P3 assessment:</b> IT team during triage, confirmed by Bronze team lead",
-        "<b>Contacting system owners:</b> IT team for P2, Bronze team lead for P1",
-        "<b>Escalation to Silver:</b> Bronze team lead only",
-        "<b>Escalation to Gold:</b> Silver tier, not IT"
-      ]}
+      {t:"p", text:"This chapter outlines the BT team roles and responsibilities at each response level. Select a level to see the responsibilities for that level only."},
+      {t:"component", name:"roles"}
     ]
   },
   {
     num:"07", id:"recovery", title:"Recovery Actions",
     blocks:[
       {t:"label", text:"RECOVERY SEQUENCE"},
-      {t:"p", text:"Recovery proceeds in phases, each gated by a Bronze team lead go/no-go decision. Select a phase to see which systems are restored and who approves the gate."},
+      {t:"p", text:"Select a response level, then select any phase to see which systems are restored. BT team lead validates each phase before moving to the next."},
       {t:"component", name:"recovery"},
+      {t:"label", text:"DRP REFERENCES"},
+      {t:"p", text:"Individual system Disaster Recovery Plans (DRPs) are maintained separately and referenced here. BT team must consult the relevant DRP for each system during recovery. DRPs are not maintained within this playbook."},
+      {t:"ul", items:DRP_REFS},
       {t:"label", text:"FAILBACK TO PRIMARY DATA CENTER"},
       {t:"ul", items:[
         "Do not fail back during the incident or under operational load",
         "Schedule a dedicated failback window after full recovery",
-        "IT team owns the failback plan and execution"
+        "BT team owns the failback plan and execution"
       ]}
     ]
   },
   {
     num:"08", id:"closure", title:"Closure Criteria",
     blocks:[
-      {t:"label", text:"IT CLOSURE CONFIRMED BY BRONZE TEAM LEAD"},
+      {t:"label", text:"IT CLOSURE CONFIRMED BY BT TEAM LEAD"},
       {t:"ul", items:[
-        "All Tier 1 and Tier 2 IT systems operational and validated",
-        "No active critical alerts on IT dashboards",
+        "All Tier 0 and Tier 1 systems operational and validated",
+        "No active critical alerts on BT dashboards",
         "All system owners notified of restoration",
         "IT service log closed and archived",
         "Failback to primary data center planned and scheduled"
       ]},
-      {t:"note", text:"Bronze team lead signs off IT closure. Operational closure is confirmed by the Airport Operations Director."}
+      {t:"note", text:"BT team lead signs off IT closure. Operational closure is confirmed by the Airport Operations Director."}
     ]
   },
   {
@@ -678,15 +729,15 @@ const CHAPTERS = [
     blocks:[
       {t:"label", text:"IT SERVICE DEGRADATION OVER TIME"},
       {t:"ul", items:[
-        "<b>0 to 30 minutes:</b> UPS active, no IT services lost if generator starts, IT team monitoring",
-        "<b>30 minutes to 2 hours:</b> generator running, IT services stable, Tier 3 shutdown in progress",
-        "<b>2 to 8 hours:</b> if generator capacity is at risk, data center cooling degrades, failover to secondary data center initiated, Tier 2 services may be impacted",
+        "<b>0 to 30 minutes:</b> UPS active, no IT services lost if generator starts, BT team monitoring",
+        "<b>30 minutes to 2 hours:</b> generator running, IT services stable, Tier 2 shutdown in progress",
+        "<b>2 to 8 hours:</b> data center cooling degrades if at risk, failover to secondary data center initiated, Tier 1 services may be impacted",
         "<b>8 hours and beyond:</b> full IT service review, secondary data center capacity may be strained, structured recovery planning begins"
       ]},
       {t:"label", text:"RESILIENCE INVESTMENT CASE"},
       {t:"ul", items:[
         "Confirming data center cooling is on a dedicated generator circuit eliminates the failover risk",
-        "Pre-contracting a mobile generator supplier with a guaranteed response time removes the generator failure risk from IT scope",
+        "Pre-contracting a mobile generator supplier with a guaranteed response time removes the generator failure risk",
         "Investing in a secondary internet connection removes the IP communications dependency"
       ]}
     ]
@@ -696,14 +747,14 @@ const CHAPTERS = [
     blocks:[
       {t:"label", text:"IT-SPECIFIC REVIEW QUESTIONS FOR THIS SCENARIO"},
       {t:"ul", items:[
-        "Did the IT team detect the power impact before receiving a call from Facilities?",
-        "Was the Tier 1, 2, and 3 IT shutdown priority list followed correctly?",
+        "Did the BT team detect the power impact before receiving a call from Facilities?",
+        "Was the Tier 0, Tier 1, and Tier 2 shutdown priority list followed correctly?",
         "Were any systems wrongly classified in the tier structure?",
         "Was the failover to the secondary data center triggered at the right threshold, or too early or too late?",
         "Were all system owners reachable within the required timeframe?",
         "Were personal mobile phones effective as a fallback when internal communications were unavailable?",
-        "Was the IT recovery sequence correct? Did any Tier 2 system come back before Tier 1?",
-        "Were any decisions made by IT that were outside IT scope?"
+        "Was the IT recovery sequence correct, and did any Tier 1 system come back before Tier 0?",
+        "Were any decisions made by BT team that were outside BT scope?"
       ]}
     ]
   },
@@ -713,18 +764,18 @@ const CHAPTERS = [
       {t:"label", text:"TOPICS TO REHEARSE"},
       {t:"ul", items:[
         "Speed of triage and severity assessment from the first alert",
-        "Execution of the IT shutdown priority list",
+        "Execution of the IT shutdown priority list across all tiers",
         "Failover to the secondary data center",
         "Communication with system owners under degraded conditions",
-        "Recovery sequence and gate decisions",
+        "Recovery sequence and gate decisions at each level",
         "Escalation to Silver tier"
       ]},
       {t:"label", text:"PASS CRITERIA"},
       {t:"ul", items:[
-        "Tier 1 systems protected within 15 minutes of P1 confirmation",
+        "Tier 0 systems protected within 15 minutes of P1 confirmation",
         "All system owners contacted within 30 minutes of P1 confirmation",
         "Failover initiated within the defined cooling threshold",
-        "No IT decision made outside IT scope"
+        "No BT team decision made outside BT scope"
       ]}
     ]
   }
@@ -736,6 +787,20 @@ function DetectIcon({name}){
   if(name==="monitor") return (<svg {...c}><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>);
   if(name==="bell") return (<svg {...c}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>);
   return (<svg {...c}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2Z"/></svg>);
+}
+
+/* ===================== Reusable level tabs ===================== */
+function LevelTabs({levels, active, onSelect}){
+  return (
+    <div className="tabs">
+      {levels.map(lv => (
+        <button key={lv}
+          className={"tab-btn" + (active===lv ? " active" : "")}
+          style={active===lv ? {background:LEVEL_COLOR[lv] || "var(--purple)"} : null}
+          onClick={() => onSelect(lv)}>{lv}</button>
+      ))}
+    </div>
+  );
 }
 
 /* ===================== COMPONENTS ===================== */
@@ -754,44 +819,81 @@ function DetectionCards(){
 }
 
 function TriageChecklist(){
-  const [done, setDone] = useState(() => TRIAGE.map(() => false));
-  const toggle = (i) => setDone(prev => prev.map((v,idx) => idx===i ? !v : v));
-  return (
-    <div className="checklist">
-      {TRIAGE.map((item,i) =>
-        <div className={"check-item" + (done[i] ? " checked" : "")} key={i} onClick={() => toggle(i)}>
-          <span className="check-box">{done[i] ? "✓" : ""}</span>
-          <span className="check-text">{item}</span>
-        </div>
-      )}
-    </div>
-  );
-}
+  const { navigate } = useContext(Nav);
+  const [answers, setAnswers] = useState(() => TRIAGE_Q.map(() => null));
+  const setAnswer = (i, val) => setAnswers(prev => prev.map((v,idx) => idx===i ? val : v));
 
-function SeverityLevels(){
+  const answeredCount = answers.filter(v => v !== null).length;
+  const allAnswered = answeredCount === TRIAGE_Q.length;
+  const score = TRIAGE_Q.reduce((sum,q,i) => sum + (answers[i] === q.scoreOn ? q.points : 0), 0);
+  const sev = severityFor(score);
+
   return (
     <div>
-      {SEVERITY.map((s,i) =>
-        <div className="sev-row" key={i}>
-          <span className={"sev-tag " + s.cls}>{s.tag}</span>
-          <span className="sev-text">{s.text}</span>
+      <p className="triage-intro">Answer each question. The interface scores the answers and assigns the severity level automatically. You do not assign it yourself.</p>
+      {TRIAGE_Q.map((q,i) => (
+        <div className="q-item" key={i}>
+          <div className="q-text">{q.q}</div>
+          <div className="q-btns">
+            {["Yes","No"].map(opt => (
+              <button key={opt}
+                className={"q-btn" + (answers[i]===opt ? " sel" : "")}
+                onClick={() => setAnswer(i, opt)}>{opt}</button>
+            ))}
+          </div>
         </div>
-      )}
+      ))}
+
+      <div className="sev-result">
+        {answeredCount === 0 ? (
+          <div className="sev-pending">Answer the questions above to calculate the severity level</div>
+        ) : (
+          <React.Fragment>
+            <div className="sev-result-head">
+              <span className={"sev-badge " + sev.cls}>{sev.p}</span>
+              <span className="sev-score">Score {score}{allAnswered ? "" : " so far, " + (TRIAGE_Q.length - answeredCount) + " question(s) left"}</span>
+            </div>
+            <div className="sev-desc">{sev.text}</div>
+            {allAnswered &&
+              <button className="cta-btn" onClick={() => navigate("pre-authorized", P_TO_LEVEL[sev.p])}>
+                Go to Pre-Authorized Decisions
+              </button>}
+          </React.Fragment>
+        )}
+      </div>
     </div>
   );
 }
 
-function CommunicationFlow(){
-  const [open, setOpen] = useState(null);
+function PreAuthDecisions(){
+  const { preselect } = useContext(Nav);
+  const [level, setLevel] = useState(preselect || "Monitoring");
+  const d = PREAUTH[level];
+  return (
+    <div>
+      <LevelTabs levels={LEVELS} active={level} onSelect={setLevel} />
+      <p className="level-intro">{d.intro}</p>
+      <div className="section-label">BT TEAM IS PRE-AUTHORIZED TO</div>
+      <ul className="block-ul">{d.auth.map((it,i) => <li key={i}>{it}</li>)}</ul>
+      {d.examples &&
+        <React.Fragment>
+          <div className="block-h">{d.examplesLabel}</div>
+          <ul className="block-ul">{d.examples.map((it,i) => <li key={i}>{it}</li>)}</ul>
+        </React.Fragment>}
+      {d.note && <div className="note-box">{d.note}</div>}
+    </div>
+  );
+}
+
+function CommFlow({steps}){
   return (
     <div className="flow-row">
-      {FLOW.map((s,i) => (
+      {steps.map((s,i) => (
         <React.Fragment key={i}>
           {i>0 && <div className="flow-arrow">{"→"}</div>}
-          <div className={"flow-step" + (open===i ? " active" : "")} onClick={() => setOpen(open===i ? null : i)}>
+          <div className="flow-step">
             <div className="flow-step-num">{i+1}</div>
-            <div className="flow-step-title">{s.title}</div>
-            {open===i && <div className="flow-step-who"><b>Who is involved:</b> {s.who}</div>}
+            <div className="flow-step-title">{s}</div>
           </div>
         </React.Fragment>
       ))}
@@ -799,15 +901,17 @@ function CommunicationFlow(){
   );
 }
 
-function OwnerCards(){
+function OwnerCards({pLevel}){
   const [open, setOpen] = useState(null);
+  const cats = OWNER_CATS_BY_P[pLevel];
   const initials = (role) => role.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+  const shown = OWNERS.filter(([,cat]) => cats.includes(cat));
   return (
     <div className="owner-grid">
-      {OWNERS.map(([role, when],i) => {
-        const isOpen = open === i;
+      {shown.map(([role, cat, when]) => {
+        const isOpen = open === role;
         return (
-          <div className="owner-card" key={i} onClick={() => setOpen(isOpen ? null : i)}>
+          <div className="owner-card" key={role} onClick={() => setOpen(isOpen ? null : role)}>
             <div className="owner-head">
               <span className="owner-avatar">{initials(role)}</span>
               <span className="owner-role">{role}</span>
@@ -815,12 +919,12 @@ function OwnerCards(){
             </div>
             {isOpen &&
               <div className="owner-details">
+                <div className="owner-line"><b>Category</b>{cat}</div>
                 <div className="owner-line"><b>Name</b>{TBC_NAME}</div>
                 <div className="owner-line"><b>Phone</b>{TBC_PHONE}</div>
                 <div className="owner-line"><b>Email</b>{TBC_EMAIL}</div>
                 <div className="owner-line"><b>When to contact</b>{when}</div>
-              </div>
-            }
+              </div>}
           </div>
         );
       })}
@@ -828,33 +932,78 @@ function OwnerCards(){
   );
 }
 
-function RecoveryTimeline(){
-  const [active, setActive] = useState(null);
+function Communications(){
+  const [pLevel, setPLevel] = useState("P3");
+  const d = COMMS[pLevel];
   return (
-    <div className="timeline-wrap">
-      <div className="timeline-marks">
-        {TIMELINE_MARKS.map((m,i) => <span className="timeline-mark" key={i}>{m}</span>)}
-      </div>
-      <div className="timeline-bar" />
-      <div className="phase-row">
-        {PHASES.map((p,i) => (
-          <React.Fragment key={i}>
-            {i>0 && <div className="gate"><span className="gate-dot">{"✓"}</span><span className="gate-label">GATE</span></div>}
-            <div className={"phase-block" + (active===i ? " active" : "")} style={{background:p.color}} onClick={() => setActive(active===i ? null : i)}>
-              <span className="phase-label">{p.label}</span>
-              <span className="phase-range">{p.range}</span>
-            </div>
-          </React.Fragment>
+    <div>
+      <div className="section-label">COMMUNICATION PLAN BY PRIORITY LEVEL</div>
+      <div className="tabs">
+        {["P3","P2","P1"].map(p => (
+          <button key={p}
+            className={"tab-btn" + (pLevel===p ? " active" : "")}
+            style={pLevel===p ? {background:LEVEL_COLOR[COMMS[p].level]} : null}
+            onClick={() => setPLevel(p)}>{p}</button>
         ))}
       </div>
-      {active !== null &&
-        <div className="phase-detail">
-          <div className="phase-detail-title">{PHASES[active].label}: {PHASES[active].title}</div>
-          <ul className="block-ul">{PHASES[active].systems.map((s,i) => <li key={i}>{s}</li>)}</ul>
-          <div className="phase-approver">Gate approved by: {PHASES[active].approver}</div>
+      <ul className="block-ul">{d.plan.map((it,i) => <li key={i}>{it}</li>)}</ul>
+      <div className="block-h">Communication flow</div>
+      <CommFlow steps={d.flow} />
+      <div className="section-label">SYSTEM OWNER CONTACTS</div>
+      <OwnerCards pLevel={pLevel} />
+      <div className="section-label">FALLBACK COMMUNICATIONS</div>
+      <ul className="block-ul">
+        <li>If internal communications (office phones, Teams, Slack) are unavailable, all BT staff use personal mobile phones</li>
+        <li>This is an assumed permission confirmed in the preparation phase</li>
+      </ul>
+    </div>
+  );
+}
+
+function RolesResponsibilities(){
+  const [level, setLevel] = useState("Monitoring");
+  const groups = ROLES[level];
+  return (
+    <div>
+      <LevelTabs levels={LEVELS} active={level} onSelect={setLevel} />
+      {groups.map((g,i) => (
+        <React.Fragment key={i}>
+          <div className="block-h">{g.role}</div>
+          <ul className="block-ul">{g.items.map((it,j) => <li key={j}>{it}</li>)}</ul>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+function RecoveryTimeline(){
+  const [level, setLevel] = useState("Monitoring");
+  const [active, setActive] = useState(null);
+  const phases = RECOVERY[level];
+  const color = LEVEL_COLOR[level];
+  return (
+    <div>
+      <LevelTabs levels={LEVELS} active={level} onSelect={(lv) => { setLevel(lv); setActive(null); }} />
+      <div className="timeline-wrap">
+        <div className="phase-row">
+          {phases.map((p,i) => (
+            <React.Fragment key={i}>
+              {i>0 && <div className="gate"><span className="gate-dot">{"✓"}</span><span className="gate-label">GATE</span></div>}
+              <div className={"phase-block" + (active===i ? " active" : "")} style={{background:color}} onClick={() => setActive(active===i ? null : i)}>
+                <span className="phase-label">{p.label}</span>
+                <span className="phase-range">{p.range}</span>
+              </div>
+            </React.Fragment>
+          ))}
         </div>
-      }
-      <div className="timeline-foot">Bronze team lead validates each phase before moving to the next</div>
+        {active !== null &&
+          <div className="phase-detail">
+            <div className="phase-detail-title">{phases[active].label}: {phases[active].title}</div>
+            <ul className="block-ul">{phases[active].systems.map((s,i) => <li key={i}>{s}</li>)}</ul>
+            <div className="phase-approver">Gate approved by: {phases[active].approver}</div>
+          </div>}
+        <div className="timeline-foot">BT team lead validates each phase before moving to the next</div>
+      </div>
     </div>
   );
 }
@@ -874,8 +1023,7 @@ function ActionRow({action}){
             <span className="meta-line">{TBC_NAME}</span>
             <span className="meta-line">{TBC_PHONE}</span>
             <span className="meta-line">{TBC_EMAIL}</span>
-          </div>
-        }
+          </div>}
       </div>
     </div>
   );
@@ -885,21 +1033,19 @@ function TreeNode({node, expanded, toggle}){
   const isOpen = expanded.has(node.id);
   const hasActions = node.actions && node.actions.length > 0;
   const hasChildren = node.children && node.children.length > 0;
-  const dotTitle = {green:"Stable path", amber:"Action required", red:"Escalate", muted:"Branch"}[node.status] || "";
   return (
     <div className="node">
       <div className="node-card">
         <div className="node-head" onClick={() => toggle(node.id)}>
-          <span className={"dot " + node.status} title={dotTitle} />
           <div className="node-titlewrap"><div className="node-title">{node.title}</div></div>
           <button className={"expand-btn" + (isOpen ? " open" : "")} aria-expanded={isOpen} aria-label={isOpen ? "Collapse" : "Expand"}
             onClick={(e) => { e.stopPropagation(); toggle(node.id); }}>{isOpen ? "−" : "+"}</button>
         </div>
         <div className={"node-drawer" + (isOpen ? " open" : "")}>
           <div className="node-body">
-            {hasActions && <div className="actions-label">IT ACTIONS</div>}
+            {hasActions && <div className="actions-label">BT TEAM ACTIONS</div>}
             {hasActions && node.actions.map((act,i) => <ActionRow key={i} action={act} />)}
-            {hasChildren && <div className="children-label">WHAT-IF BRANCHES</div>}
+            {hasChildren && <div className="children-label">BRANCHES</div>}
             {hasChildren && <div className="children">{node.children.map(c => <TreeNode key={c.id} node={c} expanded={expanded} toggle={toggle} />)}</div>}
           </div>
         </div>
@@ -917,12 +1063,7 @@ function EscalationTree(){
     <div>
       <div className="tree-sub-label">ESCALATION TREE</div>
       <div className="tree-title">Escalation tree</div>
-      <p className="tree-intro">Each node is a decision point in the IT response. Click the plus button to expand a node and see the IT actions, responsible roles, and contacts, then drill into the what-if branches beneath it. Everything starts collapsed.</p>
-      <div className="tree-legend">
-        <span className="legend-item"><span className="dot green" /> Stable path</span>
-        <span className="legend-item"><span className="dot amber" /> Action required</span>
-        <span className="legend-item"><span className="dot red" /> Escalate</span>
-      </div>
+      <p className="tree-intro">Each node is a decision point in the BT team response. Use the plus button to expand a node and see the BT team actions, responsible roles, and contacts, then drill into the branches beneath it. Everything starts collapsed.</p>
       <div className="tree-controls">
         <button className="tree-btn" onClick={() => setExpanded(new Set(ALL_IDS))}>Expand all</button>
         <button className="tree-btn" onClick={() => setExpanded(new Set())}>Collapse all</button>
@@ -935,9 +1076,9 @@ function EscalationTree(){
 const COMPONENTS = {
   detection: DetectionCards,
   triage: TriageChecklist,
-  severity: SeverityLevels,
-  flow: CommunicationFlow,
-  owners: OwnerCards,
+  preauth: PreAuthDecisions,
+  comms: Communications,
+  roles: RolesResponsibilities,
   recovery: RecoveryTimeline,
   tree: EscalationTree
 };
@@ -949,6 +1090,12 @@ function ChapterBlock({block}){
     case "p":     return <p className="block-p" dangerouslySetInnerHTML={{__html:block.text}} />;
     case "note":  return <div className="note-box">{block.text}</div>;
     case "ul":    return <ul className="block-ul">{block.items.map((it,i) => <li key={i} dangerouslySetInnerHTML={{__html:it}} />)}</ul>;
+    case "tier":  return (
+      <React.Fragment>
+        <div className="tier-head"><span className="tier-chip">{block.chip}</span>{block.text}</div>
+        <ul className="block-ul">{block.items.map((it,i) => <li key={i}>{it}</li>)}</ul>
+      </React.Fragment>
+    );
     case "component": { const C = COMPONENTS[block.name]; return C ? <C /> : null; }
     default: return null;
   }
@@ -1017,18 +1164,28 @@ function App(){
   const [activeId, setActiveId] = useState("scenario-overview");
   const [navOpen, setNavOpen] = useState(false);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
+  const [preselect, setPreselect] = useState(null);
+
   const setView = (id) => { setActiveId(id); setNavOpen(false); };
+  const navigate = useCallback((id, level) => {
+    if(level) setPreselect(level);
+    setActiveId(id);
+    setNavOpen(false);
+  }, []);
+
   const chapter = CHAPTERS.find(c => c.id === activeId);
   return (
-    <div className="app">
-      <TopBar onMenu={() => setNavOpen(o => !o)} onGlossary={() => setGlossaryOpen(true)} />
-      <div className="body-row">
-        <Sidebar activeId={activeId} setView={setView} open={navOpen} />
-        <div className={"overlay" + (navOpen ? " show" : "")} onClick={() => setNavOpen(false)} />
-        <main className="main"><ChapterPanel chapter={chapter} /></main>
+    <Nav.Provider value={{ navigate, preselect }}>
+      <div className="app">
+        <TopBar onMenu={() => setNavOpen(o => !o)} onGlossary={() => setGlossaryOpen(true)} />
+        <div className="body-row">
+          <Sidebar activeId={activeId} setView={setView} open={navOpen} />
+          <div className={"overlay" + (navOpen ? " show" : "")} onClick={() => setNavOpen(false)} />
+          <main className="main"><ChapterPanel key={activeId} chapter={chapter} /></main>
+        </div>
+        {glossaryOpen && <GlossaryModal onClose={() => setGlossaryOpen(false)} />}
       </div>
-      {glossaryOpen && <GlossaryModal onClose={() => setGlossaryOpen(false)} />}
-    </div>
+    </Nav.Provider>
   );
 }
 
