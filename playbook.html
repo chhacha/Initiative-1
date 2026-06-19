@@ -908,7 +908,7 @@ const TREE = {
     }, {
       id: "1b",
       title: "Generator fails to start",
-      actions: [a("Escalate to BT team lead immediately", "BT team"), a("Calculate remaining UPS runtime and report to BT team lead", "BT team"), a("Initiate failover to secondary data center immediately", "BT team", true), a("Alert all system owners that power is critically at risk", "BT team lead"), a("Begin controlled shutdown of all non-Group A systems in priority order", "BT team")],
+      actions: [a("Escalate to BT team lead immediately", "BT team"), a("Calculate remaining UPS runtime and report to BT team lead", "BT team"), a("Initiate failover to alternate data center immediately", "BT team", true), a("Alert all system owners that power is critically at risk", "BT team lead"), a("Begin controlled shutdown of all non-Group A systems in priority order", "BT team")],
       children: []
     }, {
       id: "1c",
@@ -948,7 +948,7 @@ const TREE = {
     }, {
       id: "3c",
       title: "Core network backbone fails",
-      actions: [a("Identify which network segments are affected", "BT team"), a("Notify BT team lead of full scope of network failure", "BT team"), a("Notify all system owners that network connectivity is lost", "BT team lead"), a("Switch all communications to personal mobile phones", "BT team lead"), a("Assess whether secondary data center network connection is intact", "BT team")],
+      actions: [a("Identify which network segments are affected", "BT team"), a("Notify BT team lead of full scope of network failure", "BT team"), a("Notify all system owners that network connectivity is lost", "BT team lead"), a("Switch all communications to personal mobile phones", "BT team lead"), a("Assess whether alternate data center network connection is intact", "BT team")],
       children: []
     }]
   }, {
@@ -968,7 +968,7 @@ const TREE = {
     children: [{
       id: "5a",
       title: "Recovery plan activated",
-      actions: [a("Conduct full IT service review and document every system status", "BT team lead"), a("Assess secondary data center capacity for extended operation", "BT team"), a("Notify all system owners of extended outage and current status", "BT team"), a("Begin structured IT recovery plan preparation", "BT team lead"), a("Maintain IT service log with updates every hour", "BT team")],
+      actions: [a("Conduct full IT service review and document every system status", "BT team lead"), a("Assess alternate data center capacity for extended operation", "BT team"), a("Notify all system owners of extended outage and current status", "BT team"), a("Begin structured IT recovery plan preparation", "BT team lead"), a("Maintain IT service log with updates every hour", "BT team")],
       children: []
     }, {
       id: "5b",
@@ -1184,7 +1184,7 @@ const CHAPTERS = [{
     text: "IT SERVICE DEGRADATION OVER TIME"
   }, {
     t: "ul",
-    items: ["<b>0 to 30 minutes:</b> UPS active, no IT services lost if generator starts, BT team monitoring", "<b>30 minutes to 2 hours:</b> generator running, IT services stable, Group C shutdown in progress", "<b>2 to 8 hours:</b> data center cooling degrades if at risk, failover to secondary data center initiated, Group B services may be impacted", "<b>8 hours and beyond:</b> full IT service review, secondary data center capacity may be strained, structured recovery planning begins"]
+    items: ["<b>0 to 30 minutes:</b> UPS active, no IT services lost if generator starts, BT team monitoring", "<b>30 minutes to 2 hours:</b> generator running, IT services stable, Group C shutdown in progress", "<b>2 to 8 hours:</b> data center cooling degrades if at risk, failover to alternate data center initiated, Group B services may be impacted", "<b>8 hours and beyond:</b> full IT service review, alternate data center capacity may be strained, structured recovery planning begins"]
   }, {
     t: "label",
     text: "RESILIENCE INVESTMENT CASE"
@@ -1212,7 +1212,7 @@ const CHAPTERS = [{
     text: "TOPICS TO REHEARSE"
   }, {
     t: "ul",
-    items: ["Speed of triage and severity assessment from the first alert", "Execution of the IT shutdown priority list across all groups", "Failover to the secondary data center", "Communication with system owners under degraded conditions", "Recovery sequence and gate decisions at each level", "Escalation to Silver tier"]
+    items: ["Speed of triage and severity assessment from the first alert", "Execution of the IT shutdown priority list across all groups", "Failover to the alternate data center", "Communication with system owners under degraded conditions", "Recovery sequence and gate decisions at each level", "Escalation to Silver tier"]
   }, {
     t: "label",
     text: "PASS CRITERIA"
@@ -1685,7 +1685,7 @@ function EscalationTree() {
 }
 
 /* Post-incident scorecard: rate each question 1 to 5, get an overall maturity band */
-const REVIEW_Q = ["Did the BT team detect the power impact before receiving a call from Facilities?", "Was the Group A, Group B, and Group C shutdown priority list followed correctly?", "Were systems classified correctly in the tier structure?", "Was the failover to the secondary data center triggered at the right threshold?", "Were all system owners reachable within the required timeframe?", "Were personal mobile phones effective as a fallback when internal communications were unavailable?", "Was the IT recovery sequence correct, with no Group B system restored before Group A?", "Did the BT team stay within BT scope throughout the incident?"];
+const REVIEW_Q = ["Did the BT team detect the power impact before receiving a call from Facilities?", "Was the Group A, Group B, and Group C shutdown priority list followed correctly?", "Were systems classified correctly in the tier structure?", "Was the failover to the alternate data center triggered at the right threshold?", "Were all system owners reachable within the required timeframe?", "Were personal mobile phones effective as a fallback when internal communications were unavailable?", "Was the IT recovery sequence correct, with no Group B system restored before Group A?", "Did the BT team stay within BT scope throughout the incident?"];
 function maturityBand(avg) {
   if (avg >= 4.5) return {
     band: "Level 5: Optimized",
